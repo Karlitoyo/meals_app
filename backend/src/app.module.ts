@@ -7,6 +7,9 @@ import { UsersController } from './users/users.controller';
 import { AuthModule } from './auth/auth.module';
 import { User } from './users/user.entity';
 import { ConfigModule } from '@nestjs/config';
+import { VenuesController } from './venues/venues.controller';
+import { VenuesModule } from './venues/venues.module';
+import { Venues } from './venues/venue.entity';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -16,14 +19,15 @@ import { ConfigModule } from '@nestjs/config';
     username: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.POSTGRES_DB,
-    entities: [User],
+    entities: [User, Venues],
     synchronize: true,
   }),
   UsersModule,
+  VenuesModule,
   AuthModule,
   ConfigModule.forRoot(),
 ],
-  controllers: [AppController, UsersController],
+  controllers: [AppController, UsersController, VenuesController],
   providers: [AppService],
 })
 export class AppModule {}
