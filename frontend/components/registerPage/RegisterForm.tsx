@@ -77,7 +77,12 @@ const RegisterForm = () => {
               <p className="text-sm text-gray-900 dark:text-gray-400">
                 <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-500 dark:hover:text-blue-400">Login</Link>
               </p>
-            </div>
+              </div>
+              <div className="text-center">
+              <p className="text-sm text-gray-900 dark:text-gray-400">
+              <Link href="/venueRegister" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-500 dark:hover:text-blue-400">Host Register</Link>
+              </p>
+              </div>
           </div>
         </div>
       </div>

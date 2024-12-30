@@ -1,20 +1,42 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
-import { User } from '../users/user.entity'; // Import the user entity (assuming you have it)
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class Venues {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => User)
-  @JoinColumn()
-  user: User; // Link to the user table via a foreign key
+  @Column()
+  firstName?: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  specialty: string;
+  @Column()
+  lastName?: string;
 
-  @Column({ type: 'jsonb', nullable: true })
-  availability: any;
+  @Column({ unique: true })
+  email?: string;
+
+  @Column()
+  password?: string;
+
+  @Column()
+  address?: string;
+
+  @Column()
+  city?: string;
+
+  @Column()
+  state?: string;
+
+  @Column()
+  zip?: string;
+
+  @Column()
+  country?: string;
+
+  @Column()
+  phone?: string;
+
+  @Column({ default: false })
+  isActive?: boolean;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
