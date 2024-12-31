@@ -7,7 +7,9 @@
     "type-check": "tsc"
   },
   "dependencies": {
+    "@nestjs/jwt": "^10.2.0",
     "next": "latest",
+    "nookies": "^2.5.2",
     "react": "^18.2.0",
     "react-calendar": "^5.1.0",
     "react-dom": "^18.2.0"

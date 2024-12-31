@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Venues } from './venue.entity';
 import * as bcrypt from 'bcrypt';
-import {CreateVenueDto} from './dto/create-venue.dto';
-import {LoginVenueDto} from './dto/login-venue.dto';
+import { CreateVenueDto } from './dto/create-venue.dto';
+import { LoginVenueDto } from './dto/login-venue.dto';
 
 @Injectable()
 export class VenuesService {
@@ -58,14 +58,13 @@ export class VenuesService {
     return user; // Return the user if both email and password are valid
   }
 
-    async findOne(email: string): Promise<Venues | undefined> {
-      const user = await this.venueRepository.findOne({ where: { email } });
-      return user || undefined; // Convert null to undefined
-    }
-  
-    // Find user by email
-    async findByEmail(email: string): Promise<Venues | undefined> {
-      const user = await this.venueRepository.findOne({ where: { email } }); // Query user by email
-      return user || undefined;
-    }
+  async findById(id: number): Promise<Venues> {
+    return await this.venueRepository.findOne({ where: { id } });
+  }
+
+  // Find user by email
+  async findByEmail(email: string): Promise<Venues | undefined> {
+    const user = await this.venueRepository.findOne({ where: { email } }); // Query user by email
+    return user || undefined;
+  }
 }

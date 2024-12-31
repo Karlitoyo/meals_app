@@ -2,6 +2,7 @@ import React, { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import nookies from "nookies"; // Import nookies for cookie handling
 
 type Props = {
   children?: ReactNode;
@@ -15,7 +16,7 @@ const Layout = ({ children, title = "This is the Layout" }: Props) => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = nookies.get(null).token;
     if (token) {
       setIsLoggedIn(true);
     } else {
@@ -24,9 +25,10 @@ const Layout = ({ children, title = "This is the Layout" }: Props) => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
-    router.push("/login");
+    // Remove token from cookies on logout
+    nookies.destroy(null, "token", { path: "/" }); // Destroy cookie
+    setIsLoggedIn(false); // Update login state
+    router.push("/login"); // Redirect to login page
   };
 
   return (

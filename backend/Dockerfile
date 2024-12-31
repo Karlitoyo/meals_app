@@ -1,5 +1,5 @@
 # Stage 1: Build the NestJS application
-FROM node:20.16.0 AS build
+FROM node:20.17.0 AS build
 
 # Set the working directory
 WORKDIR /app

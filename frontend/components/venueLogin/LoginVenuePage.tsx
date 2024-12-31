@@ -13,31 +13,29 @@ export default function LoginVenue() {
     e.preventDefault();
     console.log("Form submitted with email:", email); // Log email being submitted
     setError("");
-
+  
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login-venue`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
-
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login-venue`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include', // Include cookies in the request
+      });
+  
       const data = await response.json();
       console.log("API response:", data); // Log API response for debugging
-
-      if (response.ok && data.token) {
-        localStorage.setItem("token", data.token); // Store the token in local storage
-        console.log("Token stored in local storage:", data.token); // Log stored token
-        router.push("/"); // Redirect to user dashboard on successful login
+  
+      if (response.ok) {
+        // Login successful, redirect user
+        router.push('/venueDashboard'); // Redirect to the user dashboard or home page
       } else {
-        setError(data.error || "Login failed");
+        setError(data.error || 'Login failed');
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      console.error("Error during login:", err);
+      setError('An error occurred. Please try again.');
     }
   };
 

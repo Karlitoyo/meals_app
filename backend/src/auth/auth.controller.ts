@@ -7,6 +7,7 @@ import {
   UnauthorizedException,
   HttpException,
   HttpStatus,
+  Res,
 } from '@nestjs/common';
 import { Request as ExpressRequest } from 'express';
 import { AuthService } from './auth.service';
@@ -15,6 +16,7 @@ import { LoginUserDto } from '../users/dto/login-user.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { CreateVenueDto } from '../venues/dto/create-venue.dto';
 import { LoginVenueDto } from '../venues/dto/login-venue.dto';
+import { Response } from 'express'; // Import Response from express
 
 @Controller('auth')
 export class AuthController {
@@ -35,20 +37,30 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() loginDto: LoginUserDto) {
+  async login(@Body() loginDto: LoginUserDto, @Res() res: Response) {
     const user = await this.authService.validateUser(
       loginDto.email,
       loginDto.password,
     );
+
     if (user) {
       const token = await this.authService.createToken(user); // Generate token
       console.log('Generated Token:', token); // Debugging
-      return {
+
+      // Set token in a secure, HTTP-only cookie
+      res.cookie('token', token, {
+        httpOnly: false, // Ensure the cookie can't be accessed by JavaScript
+        secure: false, // Use secure cookie in production (requires HTTPS)
+        maxAge: 3600000, // 1 hour expiration
+        path: '/', // Available for all routes
+      });
+
+      return res.json({
         message: 'Login successful',
-        token, // Return the token
-        user,
-      };
+        user, // Send user information back
+      });
     }
+
     throw new UnauthorizedException('Invalid credentials'); // Return error for invalid credentials
   }
 
@@ -66,20 +78,29 @@ export class AuthController {
   }
 
   @Post('login-venue')
-  async loginVenue(@Body() loginDto: LoginVenueDto) {
+  async loginVenue(@Body() loginDto: LoginVenueDto, @Res() res: Response) {
     const venue = await this.authService.validateVenue(
       loginDto.email,
       loginDto.password,
     );
+
     if (venue) {
       const token = await this.authService.createToken(venue); // Generate token
       console.log('Generated Token:', token); // Debugging
-      return {
+      // Set token in a secure, HTTP-only cookie
+      res.cookie('token', token, {
+        httpOnly: false, // Ensure the cookie can't be accessed by JavaScript
+        secure: false, // Use secure cookie in production (requires HTTPS)
+        maxAge: 3600000, // 1 hour expiration
+        path: '/', // Available for all routes
+      });
+
+      return res.json({
         message: 'Login successful',
-        token, // Return the token
-        venue,
-      };
+        venue, // Send venue information back
+      });
     }
+
     throw new UnauthorizedException('Invalid credentials'); // Return error for invalid credentials
   }
 

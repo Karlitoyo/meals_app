@@ -117,7 +117,7 @@ export class AuthService {
   }
 
   async loginVenue(loginVenueDto: LoginVenueDto): Promise<Venues | null> {
-    const venue = await this.venuesService.findOne(loginVenueDto.email);
+    const venue = await this.venuesService.findByEmail(loginVenueDto.email);
 
     if (!venue) {
       console.log('Venue not found');
@@ -143,7 +143,7 @@ export class AuthService {
   }
 
   async registerVenue(createVenueDto: CreateVenueDto) {
-    const existingVenue = await this.venuesService.findOne(createVenueDto.email);
+    const existingVenue = await this.venuesService.findByEmail(createVenueDto.email);
 
     if (existingVenue) {
       throw new ConflictException('Venue already exists');
