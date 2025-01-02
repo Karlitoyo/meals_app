@@ -1,11 +1,7 @@
 import { GetServerSideProps } from "next";
-
 import VenueDashboardPage from "../components/venueDashboard/VenueDashboardPage";
-
 import nookies from "nookies";
-
 import { JwtService } from "@nestjs/jwt";
-
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -24,16 +20,13 @@ const jwtService = new JwtService();
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const cookies = nookies.get(context);
-
   const token = cookies.token;
 
   if (!token) {
     console.log("No token found in cookies");
-
     return {
       redirect: {
         destination: "/login",
-
         permanent: false,
       },
     };
@@ -41,13 +34,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   try {
     const secret = process.env.SECRET_KEY;
-
     if (!secret) {
       throw new Error("Secret key is not defined");
     }
-
     const decodedToken: any = jwtService.verify(token, { secret });
-
     const userId = decodedToken.sub || decodedToken.id || null; // Ensure userId is extracted correctly
 
     return {
@@ -62,7 +52,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
       redirect: {
         destination: "/venueLogin",
-
         permanent: false,
       },
     };
