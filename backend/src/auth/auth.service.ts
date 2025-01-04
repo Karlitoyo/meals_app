@@ -68,15 +68,22 @@ export class AuthService {
     return bcrypt.compare(plainPassword, hashedPassword);
   }
 
-  async createToken(user: User) {
-    const payload = { email: user.email, sub: user.id };
-    return this.jwtService.sign(payload); // Generate JWT token with user info
+  async createToken(entity: User | Venues): Promise<string> {
+    const payload = {
+      email: entity.email,
+      sub: entity.id,
+      isUser: 'isUser' in entity ? entity.isUser : false,
+      isVenue: 'isVenue' in entity ? entity.isVenue : false,
+    };
+    console.log('Payload:', payload);
+
+    return this.jwtService.sign(payload);
   }
 
   async login(loginUserDto: LoginUserDto): Promise<User | null> {
     console.log('LoginUserDto:', loginUserDto);
 
-    const user = await this.usersService.findOne(loginUserDto.email);
+    const user = await this.usersService.findByEmail(loginUserDto.email);
 
     if (!user) {
       console.log('User not found');
@@ -103,7 +110,7 @@ export class AuthService {
 
   async register(createUserDto: CreateUserDto) {
     // Check if the user already exists
-    const existingUser = await this.usersService.findOne(createUserDto.email);
+    const existingUser = await this.usersService.findByEmail(createUserDto.email);
     if (existingUser) {
       throw new ConflictException('User already exists');
     }
@@ -143,7 +150,9 @@ export class AuthService {
   }
 
   async registerVenue(createVenueDto: CreateVenueDto) {
-    const existingVenue = await this.venuesService.findByEmail(createVenueDto.email);
+    const existingVenue = await this.venuesService.findByEmail(
+      createVenueDto.email,
+    );
 
     if (existingVenue) {
       throw new ConflictException('Venue already exists');

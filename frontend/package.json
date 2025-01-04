@@ -1,9 +1,9 @@
 {
   "private": true,
   "scripts": {
-    "dev": "next",
+    "dev": "next dev -p 5000",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 5000",
     "type-check": "tsc"
   },
   "dependencies": {
@@ -11,6 +11,7 @@
     "@types/dotenv": "^6.1.1",
     "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "next": "latest",
     "nookies": "^2.5.2",
     "react": "^18.2.0",

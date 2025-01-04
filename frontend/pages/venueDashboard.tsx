@@ -3,6 +3,7 @@ import VenueDashboardPage from "../components/venueDashboard/VenueDashboardPage"
 import nookies from "nookies";
 import { JwtService } from "@nestjs/jwt";
 import * as dotenv from "dotenv";
+import Layout from "../components/Layout";
 
 dotenv.config();
 
@@ -13,7 +14,11 @@ const Dashboard = ({
   userId: string | null;
   token: string;
 }) => {
-  return <VenueDashboardPage userId={userId} token={token} />;
+  return (
+    <Layout>
+      <VenueDashboardPage userId={userId} token={token} />
+    </Layout>
+  );
 };
 
 const jwtService = new JwtService();

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { VenueProfileProps } from "../../interfaces/venue-dashboard";
-import { getVenue } from "../../services/venueDashboard/dataService";
 import nookies from "nookies";
 
 export default function VenueDashboardPage({
@@ -55,7 +54,7 @@ export default function VenueDashboardPage({
               Here's what's happening with your projects today.
             </p>
           </div>
-          <button className="btn btn-primary">What's New?</button>
+          {/* <button className="btn btn-primary">What's New?</button> */}
         </div>
       </div>
 

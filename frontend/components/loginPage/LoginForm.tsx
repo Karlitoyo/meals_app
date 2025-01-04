@@ -2,7 +2,6 @@ import React from "react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import nookies from "nookies";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");

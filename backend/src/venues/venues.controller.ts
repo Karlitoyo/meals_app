@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, HttpException, HttpStatus, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { VenuesService } from './venues.service';
 import {CreateVenueDto} from './dto/create-venue.dto';
 import {LoginVenueDto} from './dto/login-venue.dto';

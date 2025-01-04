@@ -10,7 +10,10 @@ import { ConfigModule } from '@nestjs/config';
 import { VenuesController } from './venues/venues.controller';
 import { VenuesModule } from './venues/venues.module';
 import { Venues } from './venues/venue.entity';
-
+import { BookingsController } from './bookings/bookings.controller';
+import { AvailabilityController } from './availability/availabilitys.controller';
+import { BookingsModule } from './bookings/bookings.module';
+import { AvailabilityModule } from './availability/availabilitys.module';
 @Module({
   imports: [TypeOrmModule.forRoot({
     type: 'postgres',
@@ -25,9 +28,11 @@ import { Venues } from './venues/venue.entity';
   UsersModule,
   VenuesModule,
   AuthModule,
+  BookingsModule,
+  AvailabilityModule,
   ConfigModule.forRoot(),
 ],
-  controllers: [AppController, UsersController, VenuesController],
+  controllers: [AppController, UsersController, VenuesController, BookingsController, AvailabilityController],
   providers: [AppService],
 })
 export class AppModule {}

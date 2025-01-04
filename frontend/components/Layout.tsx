@@ -3,6 +3,7 @@ import Link from "next/link";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import nookies from "nookies"; // Import nookies for cookie handling
+import { jwtDecode } from "jwt-decode";
 
 type Props = {
   children?: ReactNode;
@@ -12,6 +13,10 @@ type Props = {
 const Layout = ({ children, title = "This is the Layout" }: Props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  const isVenue = userData?.isVenue;
+  const isUser = userData?.isUser;
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const router = useRouter();
 
@@ -21,6 +26,53 @@ const Layout = ({ children, title = "This is the Layout" }: Props) => {
       setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const token = nookies.get(null).token;
+    if (token) {
+      // Decode the token to determine the user's role
+      const decodedToken: any = jwtDecode(token);
+      console.log("decodedToken:", decodedToken);
+      const isVenue = decodedToken.isVenue;
+      const isUser = decodedToken.isUser;
+      console.log("isVenue:", isVenue);
+      console.log("isUser:", isUser);
+      // Determine the endpoint based on the user's role
+      let endpoint = "";
+
+      if (isVenue) {
+        endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/venues/profile`;
+      } else if (isUser) {
+        endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/profile`;
+      } else {
+        setError("User role is not defined");
+        return;
+      }
+
+      // Fetch data from the appropriate endpoint
+      fetch(endpoint, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to fetch user data");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setUserData(data);
+        })
+        .catch((err) => {
+          setError(err.message);
+          console.error(err);
+        });
+    } else {
+      setError("No token found");
     }
   }, []);
 
@@ -122,16 +174,22 @@ const Layout = ({ children, title = "This is the Layout" }: Props) => {
                     Home
                   </Link>
                 </li>
-                {isLoggedIn ? (
+                {isLoggedIn && (
                   <li>
                     <Link
-                      href="/dashboard"
+                      href={
+                        isVenue
+                          ? "/venueDashboard"
+                          : isUser
+                          ? "/dashboard"
+                          : "/"
+                      }
                       className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                     >
                       Dashboard
                     </Link>
                   </li>
-                ) : null}
+                )}
                 <li>
                   <Link
                     href="#"

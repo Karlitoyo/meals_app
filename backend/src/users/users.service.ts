@@ -56,9 +56,8 @@ export class UsersService {
     return user; // Return the user if both email and password are valid
   }
 
-  async findOne(email: string): Promise<User | undefined> {
-    const user = await this.userRepository.findOne({ where: { email } });
-    return user || undefined; // Convert null to undefined
+  async findById(id: number): Promise<User> {
+    return await this.userRepository.findOne({ where: { id } });
   }
 
   // Find user by email

@@ -1,7 +1,9 @@
-import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, UseGuards, Get } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../services/get-user.decorator';  // Custom decorator to extract the user from the request
 
 @Controller('users')
 export class UsersController {
@@ -24,5 +26,12 @@ export class UsersController {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       return { message: 'Login failed', error: errorMessage };
     }
+  }
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard) // Protect the route with the JWT guard
+  getProfile(@GetUser() user) { // Extract the authenticated user from the request
+    // Call a service to fetch the user by their ID from the database
+    return this.usersService.findById(user.id);
   }
 }

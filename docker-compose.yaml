@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     command: "npm run start:dev"
     ports:
-      - "3001:3001"
+      - "5001:5001"
     volumes:
       - ./backend:/app # Mount the local backend folder to /app in the container
     environment:
@@ -29,9 +29,9 @@ services:
       NODE_ENV: "development"
       WATCHPACK_POLLING: true
       CHOKIDAR_USEPOLLING: true
-      APPLICATION_PORT: "3000"
+      APPLICATION_PORT: "5000"
     ports:
-      - "3000:3000"
+      - "5000:5000"
     volumes:
       - ./frontend:/app # Mount the local frontend folder to /app in the container
     depends_on:
