@@ -1,11 +1,18 @@
 import React from "react";
-import {CardProps} from "../../interfaces/dashboard-card-comp";
+import { useRouter } from "next/router";
+import { CardProps } from "../../interfaces/dashboard-card-comp";
 
-const Card: React.FC<CardProps> = ({ service, onSelect }) => {
+const Card: React.FC<CardProps> = ({ service }) => {
+  const router = useRouter();
+
+  const handleSelect = () => {
+    router.push(`/bookings/${service.id}`); // Navigate to the booking page with the service ID
+  };
+
   return (
     <div
       className="card w-full bg-white shadow-md rounded-lg overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg"
-      onClick={onSelect}
+      onClick={handleSelect}
     >
       {/* Image Section */}
       <div className="w-full h-48 bg-gray-200">
@@ -26,3 +33,4 @@ const Card: React.FC<CardProps> = ({ service, onSelect }) => {
 };
 
 export default Card;
+

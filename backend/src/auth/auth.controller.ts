@@ -49,10 +49,11 @@ export class AuthController {
 
       // Set token in a secure, HTTP-only cookie
       res.cookie('token', token, {
-        httpOnly: false, // Ensure the cookie can't be accessed by JavaScript
+        httpOnly: true, // Ensure the cookie can't be accessed by JavaScript
         secure: false, // Use secure cookie in production (requires HTTPS)
         maxAge: 3600000, // 1 hour expiration
         path: '/', // Available for all routes
+        sameSite: 'strict', // Enforce same-site cookie policy
       });
 
       return res.json({
@@ -89,10 +90,11 @@ export class AuthController {
       console.log('Generated Token:', token); // Debugging
       // Set token in a secure, HTTP-only cookie
       res.cookie('token', token, {
-        httpOnly: false, // Ensure the cookie can't be accessed by JavaScript
+        httpOnly: true, // Ensure the cookie can't be accessed by JavaScript
         secure: false, // Use secure cookie in production (requires HTTPS)
         maxAge: 3600000, // 1 hour expiration
         path: '/', // Available for all routes
+        sameSite: 'strict', // Enforce same-site cookie policy
       });
 
       return res.json({

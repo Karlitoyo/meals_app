@@ -1,14 +1,18 @@
-import { IsNotEmpty, IsDateString } from 'class-validator';
+import { IsNotEmpty, IsDateString, IsBoolean, IsOptional } from 'class-validator';
 
 export class CreateAvailabilityDto {
+  @IsNotEmpty()
+  venueId: number;
 
   @IsNotEmpty()
   @IsDateString()
-  startTime: string; // ISO 8601 date string
+  startTime: string;
 
   @IsNotEmpty()
   @IsDateString()
-  endTime: string; // ISO 8601 date string
+  endTime: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isAvailable?: boolean;
 }
-
-
