@@ -9,9 +9,9 @@ export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Post()
+  @Post('createBooking')
   async create(@Body() createBookingDto: CreateBookingDto) {
-    return this.bookingsService.create(createBookingDto);
+    return this.bookingsService.createBooking(createBookingDto);
   }
 
   @UseGuards(JwtAuthGuard)

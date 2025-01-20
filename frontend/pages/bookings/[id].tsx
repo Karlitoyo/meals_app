@@ -4,12 +4,14 @@ import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout"; // Import Layout directly if needed
 import { createBooking } from "../api/bookings_api"; // Import the API function
 import "react-calendar/dist/Calendar.css"; // Import calendar styles
+import { verifyToken } from '../../utils/auth';
 
 interface BookingComponentProps {
   isAuthenticated: boolean;
+  userId?: number;
 }
 
-const BookingComponent: React.FC<BookingComponentProps> = ({ isAuthenticated }) => {
+const BookingComponent: React.FC<BookingComponentProps> = ({ isAuthenticated, userId }) => {
   const router = useRouter();
   const { id } = router.query; // Extract the `id` parameter from the URL
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -38,12 +40,14 @@ const handleConfirmBooking = async () => {
       const endTimeISO = endTime.toISOString();
 
       try {
-        const response = await fetch('/api/confirmBooking', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/createBooking`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: "include", // Include cookies with the request
           body: JSON.stringify({
+            userId: userId,
             venueId: Number(id),
             startTime,
             endTime: endTimeISO,
@@ -52,15 +56,15 @@ const handleConfirmBooking = async () => {
 
       const token = await response.json();
 
-      await createBooking({
-        bookingData: {
-          userId: 1, // Replace with actual user ID from your authentication system
+      await createBooking(
+        {
+          userId: userId,
           venueId: Number(id),
           startTime,
           endTime: endTimeISO,
         },
         token
-      });
+      );
 
       
       if (response.ok) {
@@ -74,7 +78,9 @@ const handleConfirmBooking = async () => {
   };
 
   return (
-    <Layout title={`Booking for Venue ID: ${id}`}>
+    <Layout 
+      title={`Booking for Venue ID: ${id}`}
+    >
       <div className="min-h-screen bg-gray-100 py-12">
         <div className="container mx-auto">
           <h1 className="text-3xl font-bold text-center mb-6">
@@ -123,12 +129,14 @@ interface ServerSideContext {
 interface ServerSideProps {
   props: {
     isAuthenticated: boolean;
+    userId?: number;
   };
 }
 
 export async function getServerSideProps(context: ServerSideContext): Promise<ServerSideProps> {
   const { req } = context;
   const token = req.cookies.token; // Access the token from cookies
+  const user = verifyToken(token);
 
   if (!token) {
     return {
@@ -141,6 +149,7 @@ export async function getServerSideProps(context: ServerSideContext): Promise<Se
   return {
     props: {
       isAuthenticated: true,
+      userId: Number(user.sub),
     },
   };
 }

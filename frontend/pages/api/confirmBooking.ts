@@ -1,19 +1,7 @@
-import { verifyToken } from '../../utils/auth'; // Adjust the import based on your project structure
-import { createBooking } from './bookings_api'; // Adjust the import based on your project structure
+import { verifyToken } from '../../utils/auth';
+import { createBooking } from './bookings_api';
 
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    try {
-      // Booking confirmation logic here
-      res.status(200).json({ message: 'Booking confirmed' });
-    } catch (error) {
-      console.error('Error confirming booking:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  } else {
-    res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
 
   const token = req.cookies.token; // Access the token from the HTTP-only cookie
 
@@ -26,18 +14,29 @@ export default async function handler(req, res) {
   if (!user) {
     return res.status(401).json({ message: 'Invalid token' });
   }
+  
+  if (req.method === 'POST') {
+    try {
+      const { venueId, startTime, endTime } = req.body;
 
-  const { venueId, startTime, endTime } = req.body;
+      // Booking confirmation logic here
+      await createBooking(
+        {
+          userId: user.sub, // 'sub' contains the user ID
+          venueId,
+          startTime,
+          endTime,
+        },
+        token
+      );
 
-  try {
-    await createBooking({
-      userId: user.sub, // Assuming 'sub' contains the user ID
-      venueId,
-      startTime,
-      endTime,
-    });
-    return res.status(200).json({ message: 'Booking confirmed' });
-  } catch (error) {
-    return res.status(500).json({ message: 'Booking failed', error: error.message });
+      return res.status(200).json({ message: 'Booking confirmed' });
+    } catch (error) {
+      console.error('Error confirming booking:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  } else {
+    res.setHeader('Allow', ['POST']);
+    return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }

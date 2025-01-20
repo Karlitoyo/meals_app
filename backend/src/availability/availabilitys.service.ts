@@ -12,8 +12,9 @@ export class AvailabilityService {
     private readonly availabilityRepository: Repository<Availability>,
   ) {}
 
-  // Create new availability for a venue
-  async create(createAvailabilityDto: CreateAvailabilityDto): Promise<Availability> {
+  async create(
+    createAvailabilityDto: CreateAvailabilityDto,
+  ): Promise<Availability> {
     const { venueId, startTime, endTime } = createAvailabilityDto;
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
@@ -21,27 +22,37 @@ export class AvailabilityService {
     // Check for overlapping availability
     const overlappingAvailability = await this.availabilityRepository.findOne({
       where: [
-        { venue: { id: venueId }, startTime: LessThanOrEqual(endDate), endTime: MoreThanOrEqual(startDate) },
+        {
+          venue: { id: venueId },
+          startTime: LessThanOrEqual(endDate),
+          endTime: MoreThanOrEqual(startDate),
+        },
       ],
     });
 
     if (overlappingAvailability) {
-      throw new BadRequestException('Overlapping availability already exists for this venue.');
+      throw new BadRequestException(
+        'Overlapping availability already exists for this venue.',
+      );
     }
 
-    const availability = this.availabilityRepository.create(createAvailabilityDto);
-    return this.availabilityRepository.save(availability);
+    try {
+      const availability = this.availabilityRepository.create(
+        createAvailabilityDto,
+      );
+      console.log('Availability created:', availability);
+      return this.availabilityRepository.save(availability);
+    } catch (error) {
+      console.error('Error creating availability:', error.message);
+      throw error;
+    }
   }
 
-  // Get all availability for a venue
-  async findAll(venueId: number): Promise<Availability[]> {
-    return this.availabilityRepository.find({
-      where: { venue: { id: venueId }, isAvailable: true },
-    });
-  }
-
-  // Check if a venue is available for a specific time range
-  async isVenueAvailable(venueId: number, startTime: Date, endTime: Date): Promise<boolean> {
+  async markAsBooked(
+    venueId: number,
+    startTime: Date,
+    endTime: Date,
+  ): Promise<void> {
     const availability = await this.availabilityRepository.findOne({
       where: {
         venue: { id: venueId },
@@ -51,12 +62,43 @@ export class AvailabilityService {
       },
     });
 
-    return !!availability; // Returns true if available, false otherwise
+    if (!availability) {
+      throw new BadRequestException(
+        'No available slot found for the specified time range.',
+      );
+    }
+
+    availability.isAvailable = false;
+    await this.availabilityRepository.save(availability);
   }
 
-  // Update availability record
-  async update(id: number, updateAvailabilityDto: UpdateAvailabilityDto): Promise<Availability> {
-    const availability = await this.availabilityRepository.findOne({ where: { id } });
+    // Check if a venue is available for a specific time range
+    async isVenueAvailable(venueId: number, startTime: Date, endTime: Date): Promise<boolean> {
+      const availability = await this.availabilityRepository.findOne({
+        where: {
+          venue: { id: venueId },
+          startTime: LessThanOrEqual(startTime),
+          endTime: MoreThanOrEqual(endTime),
+          isAvailable: true,
+        },
+      });
+  
+      return !!availability; // Returns true if available, false otherwise
+    }
+
+  async findAll(venueId: number): Promise<Availability[]> {
+    return this.availabilityRepository.find({
+      where: { venue: { id: venueId }, isAvailable: true },
+    });
+  }
+
+  async update(
+    id: number,
+    updateAvailabilityDto: UpdateAvailabilityDto,
+  ): Promise<Availability> {
+    const availability = await this.availabilityRepository.findOne({
+      where: { id },
+    });
 
     if (!availability) {
       throw new BadRequestException('Availability record not found.');
@@ -66,9 +108,10 @@ export class AvailabilityService {
     return this.availabilityRepository.save(availability);
   }
 
-  // Delete availability
   async remove(id: number): Promise<void> {
-    const availability = await this.availabilityRepository.findOne({ where: { id } });
+    const availability = await this.availabilityRepository.findOne({
+      where: { id },
+    });
 
     if (!availability) {
       throw new BadRequestException('Availability record not found.');

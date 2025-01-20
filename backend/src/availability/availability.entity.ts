@@ -1,15 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 import { Venues } from '../venues/venue.entity';
 
 @Entity()
-
 export class Availability {
-
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Venues, venue => venue.id)
+  @ManyToOne(() => Venues, (venue) => venue.id)
   @JoinColumn({ name: 'venueId' })
   venue: Venues;
 
@@ -24,7 +28,4 @@ export class Availability {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
-
 }
-
-

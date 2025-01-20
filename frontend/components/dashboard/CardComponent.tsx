@@ -2,7 +2,7 @@ import React from "react";
 import { useRouter } from "next/router";
 import { CardProps } from "../../interfaces/dashboard-card-comp";
 
-const Card: React.FC<CardProps> = ({ service }) => {
+export const Card: React.FC<CardProps> = ({ service }) => {
   const router = useRouter();
 
   const handleSelect = () => {

@@ -14,6 +14,9 @@ import { BookingsController } from './bookings/bookings.controller';
 import { AvailabilityController } from './availability/availabilitys.controller';
 import { BookingsModule } from './bookings/bookings.module';
 import { AvailabilityModule } from './availability/availabilitys.module';
+import { Availability } from './availability/availability.entity';
+import { Booking } from './bookings/booking.entity';
+
 @Module({
   imports: [TypeOrmModule.forRoot({
     type: 'postgres',
@@ -22,7 +25,7 @@ import { AvailabilityModule } from './availability/availabilitys.module';
     username: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.POSTGRES_DB,
-    entities: [User, Venues],
+    entities: [User, Venues, Booking, Availability],
     synchronize: true,
   }),
   UsersModule,

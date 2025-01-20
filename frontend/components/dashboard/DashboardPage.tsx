@@ -2,6 +2,7 @@ import React from "react";
 import Card from "./CardComponent";
 import { services } from "../../public/shared/constants/constants";
 import { useRouter } from 'next/router';
+import { VenueList } from "./VenuesApiComponent";
 
 export default function DashboardPage() {
     const router = useRouter();

@@ -9,7 +9,7 @@ export class AvailabilityController {
   constructor(private readonly availabilityService: AvailabilityService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Post()
+  @Post('create')
   async create(@Body() createAvailabilityDto: CreateAvailabilityDto) {
     return this.availabilityService.create(createAvailabilityDto);
   }

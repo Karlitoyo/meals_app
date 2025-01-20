@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { VenuesService } from '../venues/venues.service';
@@ -9,6 +9,12 @@ import { User } from '../users/user.entity'; // Replace with your actual User en
 import { CreateVenueDto } from '../venues/dto/create-venue.dto';
 import { LoginVenueDto } from '../venues/dto/login-venue.dto';
 import { Venues } from '../venues/venue.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { Booking } from '../bookings/booking.entity';
+import { Availability } from '../availability/availability.entity';
+import { CreateBookingDto } from '../bookings/dto/create-booking.dto';
+import { AvailabilityService } from '../availability/availabilitys.service';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +24,13 @@ export class AuthService {
     private usersService: UsersService,
     private venuesService: VenuesService,
     private jwtService: JwtService,
+    @InjectRepository(Booking)
+    private bookingsRepository: Repository<Booking>,
+    @InjectRepository(Availability)
+    private availabilityRepository: Repository<Availability>,
+    private readonly availabilityService: AvailabilityService,
   ) {}
+
 
   async validateUser(email: string, password: string): Promise<any> {
     console.log('Validating user with email:', email);
@@ -74,6 +86,7 @@ export class AuthService {
       sub: entity.id,
       isUser: 'isUser' in entity ? entity.isUser : false,
       isVenue: 'isVenue' in entity ? entity.isVenue : false,
+      isLoggedIn: entity.isActive,
     };
     console.log('Payload:', payload);
 
@@ -173,4 +186,41 @@ export class AuthService {
   async isTokenBlacklisted(token: string): Promise<boolean> {
     return this.tokenBlacklist.has(token);
   }
+
+  async createBooking(createBookingDto: CreateBookingDto) {
+    const { venueId, startTime, endTime } = createBookingDto;
+    const startDate = new Date(startTime);
+    const endDate = new Date(endTime);
+
+    // Check if the venue is available for the given time
+    const availability = await this.availabilityRepository.findOne({
+      where: {
+        venue: { id: venueId },
+        startTime: LessThanOrEqual(startDate),
+        endTime: MoreThanOrEqual(endDate),
+        isAvailable: true,
+      },
+    });
+
+    if (!availability) {
+      throw new BadRequestException(
+        'Venue is not available at the selected time.',
+      );
+    }
+    
+    // Ensure the booking time is within the availability slot
+    if (startDate < availability.startTime || endDate > availability.endTime) {
+      throw new BadRequestException(
+        'Booking time is outside the available slot.',
+      );
+    }
+
+    // Mark the availability as booked
+    await this.availabilityService.markAsBooked(venueId, startDate, endDate);
+
+    // Create the booking
+    const booking = this.bookingsRepository.create(createBookingDto);
+    return this.bookingsRepository.save(booking);
+  }
 }
+

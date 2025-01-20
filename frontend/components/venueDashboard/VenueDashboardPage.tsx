@@ -1,45 +1,55 @@
 import React, { useEffect, useState } from "react";
-import { VenueProfileProps } from "../../interfaces/venue-dashboard";
 import nookies from "nookies";
+import CreateAvailabilityForm from "./availabilityConfirm";
+import { GetServerSideProps } from "next";
 
-export default function VenueDashboardPage({
-  userId,
-  token,
-}: VenueProfileProps): React.ReactElement {
+interface UserData {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+interface VenueDashboardPageProps {
+  token: string | null;
+}
+
+export default function VenueDashboardPage({ token }: VenueDashboardPageProps): React.ReactElement {
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = nookies.get(null).token; // Get the token from cookies
-
     if (token) {
-      // Make the GET request using fetch
       fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/venues/profile`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${token}`,  // Add the token in the Authorization header
+          Authorization: `Bearer ${token}`, // Add the token in the Authorization header
         },
+        credentials: "include", // Include cookies in the request
       })
         .then((response) => {
           if (!response.ok) {
-            throw new Error('Failed to fetch user data');
+            throw new Error("Failed to fetch user data");
           }
+
           return response.json(); // Parse the JSON response
         })
-        .then((data) => {
+
+        .then((data: UserData) => {
           setUserData(data); // Set the user data
         })
-        .catch((err) => {
+
+        .catch((err: Error) => {
           setError(err.message); // Handle errors
+
           console.error(err);
         });
     } else {
-      setError('No token found');
+      setError("No token found");
     }
-  }, []);
+  }, [token]);
 
-  if (error) return <p>Error: {error}</p>;
-  if (!userData) return <p>Loading user information...</p>;
+  if (error) return <div>Error: {error}</div>;
+  if (!userData) return <div>Loading user information...</div>;
 
   return (
     <div className="grid gap-4 lg:grid-cols-3">
@@ -54,7 +64,6 @@ export default function VenueDashboardPage({
               Here's what's happening with your projects today.
             </p>
           </div>
-          {/* <button className="btn btn-primary">What's New?</button> */}
         </div>
       </div>
 
@@ -134,6 +143,18 @@ export default function VenueDashboardPage({
           </li>
         </ul>
       </div>
+      {/* Users by Country */}
+      <CreateAvailabilityForm venueId={userData.id} />
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const cookies = nookies.get(context);
+  const token = cookies.token || null;
+  return {
+    props: {
+      token,
+    },
+  };
+};

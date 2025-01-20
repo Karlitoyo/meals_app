@@ -17,6 +17,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { CreateVenueDto } from '../venues/dto/create-venue.dto';
 import { LoginVenueDto } from '../venues/dto/login-venue.dto';
 import { Response } from 'express'; // Import Response from express
+import { CreateBookingDto } from '../bookings/dto/create-booking.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -114,5 +115,10 @@ export class AuthController {
       return { message: 'Logged out successfully' };
     }
     return { message: 'No token provided' };
+  }
+
+  @Post('createBooking')
+  async createBooking(@Body() createBookingDto: CreateBookingDto) {
+    return this.authService.createBooking(createBookingDto);
   }
 }
