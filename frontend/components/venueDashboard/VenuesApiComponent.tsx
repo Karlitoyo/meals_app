@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
-import Card from "./CardComponent"; // Adjust the import path as necessary
+import Card from "../dashboard/CardComponent"; // Adjust the import path as necessary
 import nookies from "nookies";
 
 interface Venue {

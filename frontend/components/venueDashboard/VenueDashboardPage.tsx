@@ -2,54 +2,64 @@ import React, { useEffect, useState } from "react";
 import nookies from "nookies";
 import CreateAvailabilityForm from "./availabilityConfirm";
 import { GetServerSideProps } from "next";
+import { VenueList } from "./VenuesApiComponent";
+import jwt from "jsonwebtoken";
+import { verifyToken } from '../../utils/auth';
 
-interface UserData {
+interface VenueData {
   firstName: string;
   lastName: string;
   email: string;
 }
 
-interface VenueDashboardPageProps {
-  token: string | null;
-}
-
-export default function VenueDashboardPage({ token }: VenueDashboardPageProps): React.ReactElement {
-  const [userData, setUserData] = useState(null);
+export default function VenueDashboardPage({
+  venueId,
+  token,
+}): React.ReactElement {
+  const [venueData, setVenueData] = useState(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (token) {
-      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/venues/profile`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`, // Add the token in the Authorization header
-        },
-        credentials: "include", // Include cookies in the request
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to fetch user data");
-          }
-
-          return response.json(); // Parse the JSON response
-        })
-
-        .then((data: UserData) => {
-          setUserData(data); // Set the user data
-        })
-
-        .catch((err: Error) => {
-          setError(err.message); // Handle errors
-
-          console.error(err);
-        });
-    } else {
-      setError("No token found");
+    console.log("Venue ID:", venueId);
+    console.log("Token:", token);
+    if (!venueId || !token) {
+      setError("Missing venue ID or token.");
+      return;
     }
-  }, [token]);
+
+    const fetchVenueInfo = async () => {
+      try {
+        console.log("Fetching venue data...", venueId, token);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/venues/${venueId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch venue data");
+        }
+
+        const data = await response.json();
+        setVenueData(data);
+      } catch (error) {
+        console.error("Error fetching venue data:", error);
+        setError(error.message);
+      }
+    };
+
+    fetchVenueInfo();
+  }, [venueId, token]);
 
   if (error) return <div>Error: {error}</div>;
-  if (!userData) return <div>Loading user information...</div>;
+  if (!venueData) return <div>Loading user information...</div>;
+
 
   return (
     <div className="grid gap-4 lg:grid-cols-3">
@@ -58,7 +68,7 @@ export default function VenueDashboardPage({ token }: VenueDashboardPageProps): 
         <div className="flex justify-between items-center">
           <div>
             <h2 className="text-lg font-bold">
-              Good afternoon, {userData?.firstName || "Guest"}
+              Good afternoon, {venueData?.firstName || "Guest"}
             </h2>
             <p className="text-gray-500">
               Here's what's happening with your projects today.
@@ -144,17 +154,8 @@ export default function VenueDashboardPage({ token }: VenueDashboardPageProps): 
         </ul>
       </div>
       {/* Users by Country */}
-      <CreateAvailabilityForm venueId={userData.id} />
+      <CreateAvailabilityForm venueId={venueData.id} />
+      <VenueList venueId={venueId} token={token} />
     </div>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const cookies = nookies.get(context);
-  const token = cookies.token || null;
-  return {
-    props: {
-      token,
-    },
-  };
-};

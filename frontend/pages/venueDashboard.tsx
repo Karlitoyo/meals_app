@@ -1,66 +1,76 @@
-import { GetServerSideProps } from "next";
-import VenueDashboardPage from "../components/venueDashboard/VenueDashboardPage";
-import nookies from "nookies";
-import { JwtService } from "@nestjs/jwt";
-import * as dotenv from "dotenv";
 import Layout from "../components/Layout";
+import VenueDashboardPage from "../components/venueDashboard/VenueDashboardPage";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
-dotenv.config();
+interface DecodedToken extends JwtPayload {
+  sub: string;
+  isVenue: boolean;
+  isUser: boolean;
+}
 
-const Dashboard = ({
-  userId,
-  token,
-}: {
-  userId: string | null;
-  token: string;
-}) => {
-  return (
-    <Layout>
-      <VenueDashboardPage userId={userId} token={token} />
-    </Layout>
-  );
-};
+interface VenueDashboardPageProps {
+  venueId: number;
+  token: string | null;
+  isVenue: boolean;
+  isUser: boolean;
+}
 
-const jwtService = new JwtService();
+const Dashboard = ({ venueId, token, isUser, isVenue }: VenueDashboardPageProps): JSX.Element => (
+  <Layout title="Venue Dashboard | Meals App" token={token} isUser={isUser} isVenue={isVenue}>
+  <VenueDashboardPage venueId={venueId} token={token} />
+  </Layout>
+);
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const cookies = nookies.get(context);
-  const token = cookies.token;
+export default Dashboard;
+
+export async function getServerSideProps(context) {
+  const { req } = context;
+  const token = req.cookies.token;
 
   if (!token) {
-    console.log("No token found in cookies");
+    console.error("No token found in cookies.");
     return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
+      props: {
+        token: '',
+        venueId: null,
       },
     };
   }
 
   try {
-    const secret = process.env.SECRET_KEY;
-    if (!secret) {
-      throw new Error("Secret key is not defined");
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY) as DecodedToken;
+    const venueId = decodedToken.sub;
+    const isVenue = decodedToken.isVenue;
+    const isUser = decodedToken.isUser;
+
+    if (!venueId) {
+      console.error("No 'sub' claim found in token.");
+      return {
+        props: {
+          token,
+          venueId: null,
+        },
+      };
     }
-    const decodedToken: any = jwtService.verify(token, { secret });
-    const userId = decodedToken.sub || decodedToken.id || null; // Ensure userId is extracted correctly
+
+    console.log("Decoded token:", decodedToken);
+    console.log("Venue ID:", venueId);
 
     return {
       props: {
-        userId,
         token,
+        venueId: Number(venueId),
+        isVenue,
+        isUser,
       },
     };
   } catch (error) {
-    console.log("Redirecting to login due to error:", error);
-
+    console.error("Invalid token:", error);
     return {
-      redirect: {
-        destination: "/venueLogin",
-        permanent: false,
+      props: {
+        token: '',
+        venueId: null,
       },
     };
   }
-};
-
-export default Dashboard;
+}

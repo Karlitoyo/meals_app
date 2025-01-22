@@ -8,20 +8,22 @@ import { jwtDecode } from "jwt-decode";
 type Props = {
   children?: ReactNode;
   title?: string;
+  token?: string | null;
+  isUser?: boolean;
+  isVenue?: boolean;
 };
 
-const Layout = ({ children, title = "This is the Layout" }: Props) => {
+const Layout = ({ children, title = "This is the Layout", token, isUser, isVenue }: Props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState<string | null>(null);
-  const isVenue = userData?.isVenue;
-  const isUser = userData?.isUser;
+  const Venue = isUser
+  const User = isUser;
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const router = useRouter();
 
   useEffect(() => {
-    const token = nookies.get(null).token;
     if (token) {
       setIsLoggedIn(true);
     } else {
@@ -30,21 +32,12 @@ const Layout = ({ children, title = "This is the Layout" }: Props) => {
   }, []);
 
   useEffect(() => {
-    const token = nookies.get(null).token;
     if (token) {
-      // Decode the token to determine the user's role
-      const decodedToken: any = jwtDecode(token);
-      console.log("decodedToken:", decodedToken);
-      const isVenue = decodedToken.isVenue;
-      const isUser = decodedToken.isUser;
-      console.log("isVenue:", isVenue);
-      console.log("isUser:", isUser);
       // Determine the endpoint based on the user's role
       let endpoint = "";
-
-      if (isVenue) {
+      if (Venue) {
         endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/venues/profile`;
-      } else if (isUser) {
+      } else if (User) {
         endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/profile`;
       } else {
         setError("User role is not defined");
@@ -271,7 +264,7 @@ const Layout = ({ children, title = "This is the Layout" }: Props) => {
           </div>
         </nav>
       </header>
-      <main className="pt-16 pb-16">{children}</main> {/* Add padding bottom */}
+      <main className="pt-8 pb-8">{children}</main> {/* Add padding bottom */}
       <footer className="fixed bottom-0 left-0 z-20 w-full p-4 bg-white border-t border-gray-200 shadow md:flex md:items-center md:justify-between md:p-6 dark:bg-gray-800 dark:border-gray-600">
         <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
           © 2024{" "}

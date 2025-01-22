@@ -58,7 +58,7 @@ export class VenuesService {
     return user; // Return the user if both email and password are valid
   }
 
-  async findById(id: number): Promise<Venues> {
+  async findById(id: number): Promise<Venues | undefined> {
     return await this.venueRepository.findOne({ where: { id } });
   }
 

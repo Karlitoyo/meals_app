@@ -42,8 +42,8 @@ export class VenuesController {
     }
   }
   @Get(':id')
-  async getVenueData(@Param('id') venueId: number) {
-    return this.venueService.findById(venueId);
+  async getVenueData(@Param('id') id: number) {
+    return this.venueService.findById(id);
   }
   @Get('profile')
   @UseGuards(JwtAuthGuard) // Protect the route with the JWT guard

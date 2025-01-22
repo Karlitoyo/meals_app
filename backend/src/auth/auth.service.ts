@@ -86,7 +86,6 @@ export class AuthService {
       sub: entity.id,
       isUser: 'isUser' in entity ? entity.isUser : false,
       isVenue: 'isVenue' in entity ? entity.isVenue : false,
-      isLoggedIn: entity.isActive,
     };
     console.log('Payload:', payload);
 
