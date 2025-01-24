@@ -4,55 +4,78 @@ import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout"; // Import Layout directly if needed
 import { createBooking } from "../api/bookings_api"; // Import the API function
 import "react-calendar/dist/Calendar.css"; // Import calendar styles
-import { verifyToken } from '../../utils/auth';
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 interface BookingComponentProps {
-  isAuthenticated: boolean;
+  token: string | null;
   userId?: number;
 }
 
-const BookingComponent: React.FC<BookingComponentProps> = ({ isAuthenticated, userId }) => {
+interface DecodedToken extends JwtPayload {
+  sub: string;
+  isVenue: boolean;
+  isUser: boolean;
+}
+
+const BookingComponent: React.FC<BookingComponentProps> = ({
+  token,
+  userId,
+}) => {
   const router = useRouter();
   const { id } = router.query; // Extract the `id` parameter from the URL
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
+  const [selectedTime, setSelectedTime] = useState<string>("12:00");
+  console.log("selectedDate:", selectedDate);
   useEffect(() => {
-    if (!isAuthenticated) {
-      setError('You must be logged in to book a service.');
+    if (!token) {
+      setError("You must be logged in to book a service.");
     }
-  }, [isAuthenticated]);
+  }, [token]);
 
-if (!isAuthenticated) {
-  return <p>{error}</p>;
-}
+  if (!token) {
+    return <p>{error}</p>;
+  }
 
-const handleConfirmBooking = async () => {
+  const handleConfirmBooking = async () => {
     if (!selectedDate) {
       setMessage("Please select a date to proceed!");
       return;
     }
 
-      const startTime = selectedDate.toISOString(); // Assume booking is for a full day
-      const endTime = new Date(selectedDate);
-      endTime.setDate(endTime.getDate() + 1); // Add one day for the end time
-      const endTimeISO = endTime.toISOString();
+    // Create start time by combining date and time
+    const startTime = new Date(selectedDate);
+    const [hours, minutes] = selectedTime.split(":");
+    startTime.setHours(parseInt(hours), parseInt(minutes));
 
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/createBooking`, {
-          method: 'POST',
+    // Create end time (1 hour later)
+    const endTime = new Date(startTime);
+    endTime.setHours(startTime.getHours() + 1);
+
+    // Format to ISO strings
+    const startTimeISO = startTime.toISOString();
+    const endTimeISO = endTime.toISOString();
+
+    const bookingData = {
+      userId,
+      venueId: Number(id),
+      startTime,
+      endTime: endTimeISO,
+    };
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/createBooking`,
+        {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           credentials: "include", // Include cookies with the request
-          body: JSON.stringify({
-            userId: userId,
-            venueId: Number(id),
-            startTime,
-            endTime: endTimeISO,
-          }),
-        });
+          body: JSON.stringify(bookingData),
+        }
+      );
 
       const token = await response.json();
 
@@ -66,21 +89,24 @@ const handleConfirmBooking = async () => {
         token
       );
 
-      
       if (response.ok) {
-        setMessage(`Booking confirmed for Venue ID: ${id} on ${selectedDate.toDateString()}`);
+        setMessage(
+          `Booking confirmed for Venue ID: ${id} on ${selectedDate.toDateString()}`
+        );
       } else {
-        setMessage(token.message || 'Failed to confirm booking.');
+        setMessage(token.message || "Failed to confirm booking.");
       }
     } catch (error) {
-      setMessage('An error occurred while confirming the booking.');
+      setMessage("An error occurred while confirming the booking.");
     }
   };
 
+  const formatToISO8601 = (date: Date): string => {
+    return date.toISOString();
+  };
+
   return (
-    <Layout 
-      title={`Booking for Venue ID: ${id}`}
-    >
+    <Layout title={`Booking for Venue ID: ${id}`}>
       <div className="min-h-screen bg-gray-100 py-12">
         <div className="container mx-auto">
           <h1 className="text-3xl font-bold text-center mb-6">
@@ -89,9 +115,12 @@ const handleConfirmBooking = async () => {
           <div className="flex flex-col items-center">
             {/* Calendar Component */}
             <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
-              <Calendar
-                onChange={(date: Date) => setSelectedDate(date)}
-                value={selectedDate}
+              <Calendar onChange={(value) => setSelectedDate(value as Date)} value={selectedDate} />
+              <input
+                type="time"
+                value={selectedTime}
+                onChange={(e) => setSelectedTime(e.target.value)}
+                className="mt-4 p-2 border rounded"
               />
             </div>
 
@@ -106,7 +135,13 @@ const handleConfirmBooking = async () => {
             {/* Message */}
             {message && (
               <div className="mt-4 text-center">
-                <p className={`text-lg ${message.startsWith("Booking confirmed") ? "text-green-600" : "text-red-600"}`}>
+                <p
+                  className={`text-lg ${
+                    message.startsWith("Booking confirmed")
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
                   {message}
                 </p>
               </div>
@@ -118,40 +153,59 @@ const handleConfirmBooking = async () => {
   );
 };
 
-interface ServerSideContext {
-  req: {
-    cookies: {
-      token?: string;
-    };
-  };
-}
+export default BookingComponent;
 
-interface ServerSideProps {
-  props: {
-    isAuthenticated: boolean;
-    userId?: number;
-  };
-}
-
-export async function getServerSideProps(context: ServerSideContext): Promise<ServerSideProps> {
+export async function getServerSideProps(context) {
   const { req } = context;
-  const token = req.cookies.token; // Access the token from cookies
-  const user = verifyToken(token);
+  const token = req.cookies.token;
 
   if (!token) {
+    console.error("No token found in cookies.");
     return {
       props: {
-        isAuthenticated: false,
+        token: "",
+        venueId: null,
       },
     };
   }
 
-  return {
-    props: {
-      isAuthenticated: true,
-      userId: Number(user.sub),
-    },
-  };
-}
+  try {
+    const decodedToken = jwt.verify(
+      token,
+      process.env.SECRET_KEY
+    ) as DecodedToken;
+    const userId = decodedToken.sub;
+    const isVenue = decodedToken.isVenue;
+    const isUser = decodedToken.isUser;
 
-export default BookingComponent;
+    if (!userId) {
+      console.error("No 'sub' claim found in token.");
+      return {
+        props: {
+          token,
+          userId: null,
+        },
+      };
+    }
+
+    console.log("Decoded token:", decodedToken);
+    console.log("User ID:", userId);
+
+    return {
+      props: {
+        token,
+        userId: Number(userId),
+        isVenue,
+        isUser,
+      },
+    };
+  } catch (error) {
+    console.error("Invalid token:", error);
+    return {
+      props: {
+        token: "",
+        userId: null,
+      },
+    };
+  }
+}

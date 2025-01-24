@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
-import nookies from "nookies";
 import CreateAvailabilityForm from "./availabilityConfirm";
-import { GetServerSideProps } from "next";
 import { VenueList } from "./VenuesApiComponent";
-import jwt from "jsonwebtoken";
-import { verifyToken } from '../../utils/auth';
 
 interface VenueData {
   firstName: string;

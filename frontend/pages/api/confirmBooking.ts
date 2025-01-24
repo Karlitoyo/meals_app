@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const { venueId, startTime, endTime } = req.body;
-
+      console.log('req.body', req.body);
       // Booking confirmation logic here
       await createBooking(
         {
@@ -29,6 +29,7 @@ export default async function handler(req, res) {
         },
         token
       );
+      console.log('req.body2', req.body);
 
       return res.status(200).json({ message: 'Booking confirmed' });
     } catch (error) {

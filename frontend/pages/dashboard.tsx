@@ -9,15 +9,15 @@ interface DecodedToken extends JwtPayload {
   }
   
   interface DashboardPageProps {
-    venueId: number;
+    userId: number;
     token: string | null;
     isVenue: boolean;
     isUser: boolean;
   }
   
 
-const Dashboard = () => (
-  <Layout title="Dashboard Page | Meals App">
+const Dashboard = ({ userId, token, isUser, isVenue }: DashboardPageProps): JSX.Element => (
+  <Layout title="Dashboard Page | Meals App" token={token} isUser={isUser} isVenue={isVenue} userId={userId}>
     <DashboardPage />
   </Layout>
 );
@@ -40,27 +40,27 @@ export async function getServerSideProps(context) {
 
   try {
     const decodedToken = jwt.verify(token, process.env.SECRET_KEY) as DecodedToken;
-    const venueId = decodedToken.sub;
+    const userId = decodedToken.sub;
     const isVenue = decodedToken.isVenue;
     const isUser = decodedToken.isUser;
 
-    if (!venueId) {
+    if (!userId) {
       console.error("No 'sub' claim found in token.");
       return {
         props: {
           token,
-          venueId: null,
+          userId: null,
         },
       };
     }
 
     console.log("Decoded token:", decodedToken);
-    console.log("Venue ID:", venueId);
+    console.log("User ID:", userId);
 
     return {
       props: {
         token,
-        venueId: Number(venueId),
+        userId: Number(userId),
         isVenue,
         isUser,
       },
@@ -70,7 +70,7 @@ export async function getServerSideProps(context) {
     return {
       props: {
         token: '',
-        venueId: null,
+        userId: null,
       },
     };
   }

@@ -3,7 +3,6 @@ import Link from "next/link";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import nookies from "nookies"; // Import nookies for cookie handling
-import { jwtDecode } from "jwt-decode";
 
 type Props = {
   children?: ReactNode;
@@ -11,15 +10,14 @@ type Props = {
   token?: string | null;
   isUser?: boolean;
   isVenue?: boolean;
+  userId?: number;
+  venueId?: number;
 };
 
 const Layout = ({ children, title = "This is the Layout", token, isUser, isVenue }: Props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [userData, setUserData] = useState(null);
   const [error, setError] = useState<string | null>(null);
-  const Venue = isUser
-  const User = isUser;
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const router = useRouter();
 
@@ -28,44 +26,6 @@ const Layout = ({ children, title = "This is the Layout", token, isUser, isVenue
       setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (token) {
-      // Determine the endpoint based on the user's role
-      let endpoint = "";
-      if (Venue) {
-        endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/venues/profile`;
-      } else if (User) {
-        endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/profile`;
-      } else {
-        setError("User role is not defined");
-        return;
-      }
-
-      // Fetch data from the appropriate endpoint
-      fetch(endpoint, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to fetch user data");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          setUserData(data);
-        })
-        .catch((err) => {
-          setError(err.message);
-          console.error(err);
-        });
-    } else {
-      setError("No token found");
     }
   }, []);
 
@@ -264,7 +224,7 @@ const Layout = ({ children, title = "This is the Layout", token, isUser, isVenue
           </div>
         </nav>
       </header>
-      <main className="pt-8 pb-8">{children}</main> {/* Add padding bottom */}
+      <main className="pt-2 pb-16">{children}</main> {/* Add padding bottom */}
       <footer className="fixed bottom-0 left-0 z-20 w-full p-4 bg-white border-t border-gray-200 shadow md:flex md:items-center md:justify-between md:p-6 dark:bg-gray-800 dark:border-gray-600">
         <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
           © 2024{" "}
