@@ -55,9 +55,6 @@ export async function getServerSideProps(context) {
       };
     }
 
-    console.log("Decoded token:", decodedToken);
-    console.log("User ID:", userId);
-
     return {
       props: {
         token,

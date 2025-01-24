@@ -19,7 +19,6 @@ export class Availability {
   @Column({ type: 'timestamp', nullable: true })
   startTime: Date | null;
 
-
   @Column({ type: 'timestamp', nullable: true })
   endTime: Date | null;
 

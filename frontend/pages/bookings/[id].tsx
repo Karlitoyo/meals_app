@@ -22,12 +22,13 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
   userId,
 }) => {
   const router = useRouter();
-  const { id } = router.query; // Extract the `id` parameter from the URL
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string>("12:00");
   console.log("selectedDate:", selectedDate);
+  console.log("token:", token);
+  console.log("userId:", userId);
   useEffect(() => {
     if (!token) {
       setError("You must be logged in to book a service.");
@@ -59,7 +60,7 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
 
     const bookingData = {
       userId,
-      venueId: Number(id),
+      venueId: Number(userId),
       startTime,
       endTime: endTimeISO,
     };
@@ -82,7 +83,7 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
       await createBooking(
         {
           userId: userId,
-          venueId: Number(id),
+          venueId: Number(userId),
           startTime,
           endTime: endTimeISO,
         },
@@ -91,7 +92,7 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
 
       if (response.ok) {
         setMessage(
-          `Booking confirmed for Venue ID: ${id} on ${selectedDate.toDateString()}`
+          `Booking confirmed for Venue ID: ${userId} on ${selectedDate.toDateString()}`
         );
       } else {
         setMessage(token.message || "Failed to confirm booking.");
@@ -101,16 +102,12 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
     }
   };
 
-  const formatToISO8601 = (date: Date): string => {
-    return date.toISOString();
-  };
-
   return (
-    <Layout title={`Booking for Venue ID: ${id}`}>
+    <Layout title={`Booking for Venue ID: ${userId}`}>
       <div className="min-h-screen bg-gray-100 py-12">
         <div className="container mx-auto">
           <h1 className="text-3xl font-bold text-center mb-6">
-            Booking Page for Venue ID: {id}
+            Booking Page for Venue ID: {userId}
           </h1>
           <div className="flex flex-col items-center">
             {/* Calendar Component */}
