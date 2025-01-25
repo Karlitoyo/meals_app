@@ -12,7 +12,7 @@ export default function VenueDashboardPage({
   venueId,
   token,
 }): React.ReactElement {
-  const [venueData, setVenueData] = useState(null);
+  const [venueData, setVenueData] = useState<VenueData>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -150,7 +150,7 @@ export default function VenueDashboardPage({
         </ul>
       </div>
       {/* Users by Country */}
-      <CreateAvailabilityForm venueId={venueData.id} />
+      <CreateAvailabilityForm venueId={venueId} />
       <VenueList venueId={venueId} token={token} />
     </div>
   );

@@ -15,7 +15,7 @@ interface DecodedToken extends JwtPayload {
   isUser: boolean;
 }
 const Bookings = ({ userId, token, isUser, isVenue }: BookingComponentProps): JSX.Element => (
-  <Layout title="Bookings Page | Venue App" token={token} isUser={isUser} isVenue={isVenue}>
+  <Layout title="Bookings Page | Venue App" token={token} isUser={isUser} isVenue={isVenue} userId={userId}>
     <BookingComponent userId={userId} token={token} />
   </Layout>
 );
@@ -25,7 +25,7 @@ export default Bookings;
 export async function getServerSideProps(context) {
   const { req } = context;
   const token = req.cookies.token;
-
+  console.log("Token bookings page:", token);
   if (!token) {
     console.error("No token found in cookies.");
     return {

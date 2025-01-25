@@ -14,11 +14,11 @@ interface DecodedToken extends JwtPayload {
     isVenue: boolean;
     isUser: boolean;
   }
-  
+
 
 const Dashboard = ({ userId, token, isUser, isVenue }: DashboardPageProps): JSX.Element => (
   <Layout title="Dashboard Page | Meals App" token={token} isUser={isUser} isVenue={isVenue} userId={userId}>
-    <DashboardPage />
+    <DashboardPage token={token} userId={userId} />
   </Layout>
 );
 

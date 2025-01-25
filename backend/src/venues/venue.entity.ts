@@ -5,35 +5,50 @@ export class Venues {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   firstName?: string;
 
-  @Column()
+  @Column({ nullable: true })
   lastName?: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: true })
   email?: string;
 
-  @Column()
+  @Column({ nullable: true })
   password?: string;
 
-  @Column()
+  @Column({ nullable: true })
   address?: string;
 
-  @Column()
+  @Column({ nullable: true })
   city?: string;
 
-  @Column()
+  @Column({ nullable: true })
   state?: string;
 
-  @Column()
+  @Column({ nullable: true })
   zip?: string;
 
-  @Column()
+  @Column({ nullable: true })
   country?: string;
 
-  @Column()
+  @Column({ nullable: true })
   phone?: string;
+
+  @Column({ nullable: true, default: 'Untitled Venue' })
+  title?: string;
+
+  @Column({ nullable: true })
+  description?: string;
+
+  @Column({ nullable: true })
+  imageUrl?: string;
+
+  @Column({ nullable: true })
+  capacity?: number;
+
+  @Column({ nullable: true })
+  price?: number;
 
   @Column({ default: false })
   isActive?: boolean;

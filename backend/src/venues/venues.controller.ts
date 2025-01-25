@@ -21,8 +21,8 @@ export class VenuesController {
   @Post('register')
   async register(@Body() createVenueDto: CreateVenueDto) {
     try {
-      const user = await this.venueService.registerVenue(createVenueDto);
-      return user;
+      const venue = await this.venueService.registerVenue(createVenueDto);
+      return venue;
     } catch (error) {
       throw new HttpException(
         'Venue registration failed',
@@ -45,11 +45,17 @@ export class VenuesController {
   async getVenueData(@Param('id') id: number) {
     return this.venueService.findById(id);
   }
+
+  @Get('all')
+  async getAllVenues() {
+    return this.venueService.findAll();
+  }
+
   @Get('profile')
   @UseGuards(JwtAuthGuard) // Protect the route with the JWT guard
-  getProfile(@GetUser() user) {
+  getProfile(@GetUser() venue) {
     // Extract the authenticated user from the request
     // Call a service to fetch the user by their ID from the database
-    return this.venueService.findById(user.id);
+    return this.venueService.findById(venue.id);
   }
 }

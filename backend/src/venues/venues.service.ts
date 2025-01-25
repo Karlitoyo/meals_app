@@ -67,4 +67,8 @@ export class VenuesService {
     const user = await this.venueRepository.findOne({ where: { email } }); // Query user by email
     return user || undefined;
   }
+  
+  async findAll(): Promise<Venues[]> {
+    return await this.venueRepository.find();
+  }
 }

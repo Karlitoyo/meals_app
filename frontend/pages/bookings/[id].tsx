@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import Calendar from "react-calendar";
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout"; // Import Layout directly if needed
@@ -21,7 +20,6 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
   token,
   userId,
 }) => {
-  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -103,10 +101,10 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
   };
 
   return (
-    <Layout title={`Booking for Venue ID: ${userId}`}>
+    <Layout title={`Booking for Venue ID: ${userId}` } token={token}>
       <div className="min-h-screen bg-gray-100 py-12">
         <div className="container mx-auto">
-          <h1 className="text-3xl font-bold text-center mb-6">
+          <h1 className="text-3xl font-bold text-center mb-6 mt-8">
             Booking Page for Venue ID: {userId}
           </h1>
           <div className="flex flex-col items-center">
