@@ -26,44 +26,18 @@ export const Card: React.FC<CardProps & BookingComponentProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const handleSelect = () => {
-    router.push(`/bookings/${service.id}`); // Navigate to the booking page with the service ID
+    router.push({
+      pathname: `/bookings/${service.id}`, // Dynamic route
+      query: {
+        title: service.title,
+        description: service.description,
+        price: service.price,
+        firstName: service.firstName,
+        lastName: service.lastName,
+      },
+    });
   };
-
-  useEffect(() => {
-    console.log("Venue ID:", venueId);
-    console.log("Token:", token);
-    if (!venueId || !token) {
-      setError("Missing venue ID or token.");
-      return;
-    }
-
-    const handleConfirmBooking = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/venues/all`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include", // Include cookies with the request
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch venue data");
-        }
-
-        const token = await response.json();
-        console.log("Venue data:", token);
-        setVenueData(token);
-      } catch (error) {
-        console.error("Error fetching venue data:", error);
-        setError(error.message);
-      }
-    };
-    handleConfirmBooking();
-  }, [venueId, token]);
+  
 
   return (
     <div
@@ -81,7 +55,10 @@ export const Card: React.FC<CardProps & BookingComponentProps> = ({
       {/* Content Section */}
       <div className="p-6">
         <h2 className="card-title text-xl font-bold mb-2">{service.title}</h2>
+        <p className="text-gray-600 mb-4">{service.firstName}</p>
+        <p className="text-gray-600 mb-4">{service.lastName}</p>
         <p className="text-gray-600 mb-4">{service.description}</p>
+        <p className="text-gray-600 mb-4">{service.id}</p>
         <p className="text-blue-600 font-semibold">{service.price}</p>
       </div>
     </div>

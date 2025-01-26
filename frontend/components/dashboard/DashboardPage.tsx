@@ -1,13 +1,23 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Card from "./CardComponent";
 import { services } from "../../public/shared/constants/constants";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { GetServerSidePropsContext } from 'next';
+import { GetServerSidePropsContext } from "next";
 
 interface Service {
   id: number;
-  // Add other service properties based on your constants file
+  token: string | null;
+  userId: number;
+  venueId: number;
+  firstName: string;
+  lastName: string;
+  capacity: string;
+  title: string;
+  description: string;
+  price: string;
+  imageUrl: string;
+  country: string;
 }
 
 interface DashboardPageProps {
@@ -35,20 +45,58 @@ interface ServerSideProps {
 }
 
 const DashboardPage: React.FC<DashboardPageProps> = ({ userId, token }) => {
-    const router = useRouter();
+  const router = useRouter();
+  const [services, setServices] = useState([]);
+  const [error, setError] = useState(null);
   console.log("User ID - dash:", userId);
   console.log("Token - dash:", token);
   const handleCardClick = (id: number): void => {
-      router.push(`/bookings/${id}`);
+    router.push(`/bookings/${id}`);
+  };
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/venues/all-venues`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include", // Include cookies with the request
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch services");
+        }
+
+        const data = await response.json();
+
+        setServices(data);
+      } catch (error) {
+        console.error("Error fetching services:", error);
+
+        setError(error.message);
+      }
     };
+
+    fetchServices();
+  }, [token]);
 
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-6">
       <div className="container mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8 mt-8">Global Meals</h1>
+        <h1 className="text-3xl font-bold text-center mb-8 mt-8">
+          Global Meals
+        </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {services.map((service: Service) => (
-            <Card token={token} venueId={userId}
+            <Card
+              token={token}
+              venueId={service.venueId}
               key={service.id}
               service={service}
               onSelect={() => handleCardClick(service.id)}
@@ -58,9 +106,11 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ userId, token }) => {
       </div>
     </div>
   );
-}
+};
 
-export async function getServerSideProps(context: GetServerSidePropsContext): Promise<ServerSideProps> {
+export async function getServerSideProps(
+  context: GetServerSidePropsContext
+): Promise<ServerSideProps> {
   const { req } = context;
   const token = req.cookies.token;
 

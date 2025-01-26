@@ -4,6 +4,7 @@ import Layout from "../../components/Layout"; // Import Layout directly if neede
 import { createBooking } from "../api/bookings_api"; // Import the API function
 import "react-calendar/dist/Calendar.css"; // Import calendar styles
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { useRouter } from "next/router";
 
 interface BookingComponentProps {
   token: string | null;
@@ -24,9 +25,10 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string>("12:00");
-  console.log("selectedDate:", selectedDate);
-  console.log("token:", token);
-  console.log("userId:", userId);
+  const router = useRouter();
+  const { id, title, description, price, firstName, lastName } = router.query;
+  console.log("Booking for Service ID:", id);
+  console.log("Service Details:", { title, description, price, firstName, lastName });
   useEffect(() => {
     if (!token) {
       setError("You must be logged in to book a service.");
@@ -58,7 +60,7 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
 
     const bookingData = {
       userId,
-      venueId: Number(userId),
+      venueId: id,
       startTime,
       endTime: endTimeISO,
     };
@@ -81,7 +83,7 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
       await createBooking(
         {
           userId: userId,
-          venueId: Number(userId),
+          venueId: id,
           startTime,
           endTime: endTimeISO,
         },
@@ -90,7 +92,7 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
 
       if (response.ok) {
         setMessage(
-          `Booking confirmed for Venue ID: ${userId} on ${selectedDate.toDateString()}`
+          `Booking confirmed for Venue ID: ${id} on ${selectedDate.toDateString()}`
         );
       } else {
         setMessage(token.message || "Failed to confirm booking.");
@@ -101,11 +103,11 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
   };
 
   return (
-    <Layout title={`Booking for Venue ID: ${userId}` } token={token}>
+    <Layout title={`Booking for Venue ID: ${id}` } token={token}>
       <div className="min-h-screen bg-gray-100 py-12">
         <div className="container mx-auto">
           <h1 className="text-3xl font-bold text-center mb-6 mt-8">
-            Booking Page for Venue ID: {userId}
+            Booking Page for Venue ID: {id}
           </h1>
           <div className="flex flex-col items-center">
             {/* Calendar Component */}

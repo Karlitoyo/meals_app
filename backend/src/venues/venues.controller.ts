@@ -13,6 +13,7 @@ import { CreateVenueDto } from './dto/create-venue.dto';
 import { LoginVenueDto } from './dto/login-venue.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GetUser } from '../services/get-user.decorator'; // Custom decorator to extract the user from the request
+import { VenueResponseDto } from './dto/venue-response.dto';
 
 @Controller('venues')
 export class VenuesController {
@@ -41,14 +42,31 @@ export class VenuesController {
       return { message: 'Login failed', error: errorMessage };
     }
   }
-  @Get(':id')
-  async getVenueData(@Param('id') id: number) {
-    return this.venueService.findById(id);
-  }
 
-  @Get('all')
-  async getAllVenues() {
-    return this.venueService.findAll();
+  @UseGuards(JwtAuthGuard) // Use a guard if authentication is required
+  @Get('all-venues')
+  async getAllVenues(): Promise<VenueResponseDto[]> {
+    try {
+      const venues = await this.venueService.findAll();
+
+      // Format the response to include only the necessary fields
+      const formattedVenues = venues.map((venue) => ({
+        id: venue.id,
+        firstName: venue.firstName,
+        lastName: venue.lastName,
+        title: venue.title,
+        description: venue.description,
+        imageUrl: venue.imageUrl,
+        capacity: venue.capacity,
+        price: venue.price,
+        isActive: venue.isActive,
+        createdAt: venue.createdAt,
+      }));
+
+      return formattedVenues;
+    } catch (error) {
+      throw new Error('Error fetching venues');
+    }
   }
 
   @Get('profile')
@@ -57,5 +75,10 @@ export class VenuesController {
     // Extract the authenticated user from the request
     // Call a service to fetch the user by their ID from the database
     return this.venueService.findById(venue.id);
+  }
+
+  @Get(':id')
+  async getVenueData(@Param('id') id: number) {
+    return this.venueService.findById(id);
   }
 }
