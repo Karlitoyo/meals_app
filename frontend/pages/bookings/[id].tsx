@@ -60,7 +60,7 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
 
     const bookingData = {
       userId,
-      venueId: id,
+      venueId: Number(id),
       startTime,
       endTime: endTimeISO,
     };
@@ -83,7 +83,7 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
       await createBooking(
         {
           userId: userId,
-          venueId: id,
+          venueId: Number(id),
           startTime,
           endTime: endTimeISO,
         },
