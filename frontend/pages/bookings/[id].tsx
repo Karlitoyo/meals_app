@@ -61,7 +61,7 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
     const bookingData = {
       userId,
       venueId: Number(id),
-      startTime,
+      startTime: startTimeISO,
       endTime: endTimeISO,
     };
 
@@ -78,24 +78,24 @@ const BookingComponent: React.FC<BookingComponentProps> = ({
         }
       );
 
-      const token = await response.json();
+      const data = await response.json();
 
-      await createBooking(
-        {
-          userId: userId,
-          venueId: Number(id),
-          startTime,
-          endTime: endTimeISO,
-        },
-        token
-      );
+      // await createBooking(
+      //   {
+      //     userId: userId,
+      //     venueId: Number(id),
+      //     startTime: startTimeISO,
+      //     endTime: endTimeISO,
+      //   },
+      //   token
+      // );
 
       if (response.ok) {
         setMessage(
           `Booking confirmed for Venue ID: ${id} on ${selectedDate.toDateString()}`
         );
       } else {
-        setMessage(token.message || "Failed to confirm booking.");
+        setMessage(data.message || "Failed to confirm booking.");
       }
     } catch (error) {
       setMessage("An error occurred while confirming the booking.");

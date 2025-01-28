@@ -15,6 +15,7 @@ const CreateAvailabilityForm: React.FC<CreateAvailabilityFormProps> = ({venueId}
       setMessage('Venue ID is required.');
       return;
     }
+    console.log('Creating availability:', { venueId, startTime, endTime });
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/availability/create`, {
@@ -50,11 +51,7 @@ return (
     <div>
       <div>
         <label>Venue ID:</label>
-        <input
-          type="text"
-          value={venueId}
-          readOnly
-        />
+        <h2>{venueId}</h2>
       </div>
 
       <div>

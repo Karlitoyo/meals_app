@@ -12,9 +12,12 @@ export class Availability {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Venues, (venue) => venue.id)
+  @ManyToOne(() => Venues, (venue) => venue.availabilities, { nullable: true }) // Add the inverse relationship
   @JoinColumn({ name: 'venueId' })
   venue: Venues;
+
+  @Column({ nullable: true })
+  venueId: number; // Explicitly define venueId for clarity
 
   @Column({ type: 'timestamp', nullable: true })
   startTime: Date | null;

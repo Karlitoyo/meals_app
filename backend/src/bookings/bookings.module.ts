@@ -6,9 +6,9 @@ import { BookingsController } from './bookings.controller';
 import { AvailabilityController } from 'src/availability/availabilitys.controller';
 import { AvailabilityService } from 'src/availability/availabilitys.service';
 import { Availability } from 'src/availability/availability.entity';
-
+import { Venues } from 'src/venues/venue.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([Booking, Availability])],
+  imports: [TypeOrmModule.forFeature([Booking, Availability, Venues])],
   controllers: [BookingsController, AvailabilityController],
   providers: [BookingsService, AvailabilityService],
   exports: [BookingsService],

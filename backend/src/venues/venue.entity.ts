@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Availability } from '../availability/availability.entity'; // Adjust the path if needed
 
 @Entity()
 export class Venues {
@@ -58,4 +59,8 @@ export class Venues {
 
   @Column({ default: true })
   isVenue?: boolean;
+
+  // Add the relationship to Availability
+  @OneToMany(() => Availability, (availability) => availability.venue, { nullable: true })
+  availabilities: Availability[]; // One venue can have multiple availabilities
 }
