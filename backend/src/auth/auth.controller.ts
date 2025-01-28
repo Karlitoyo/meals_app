@@ -121,4 +121,16 @@ export class AuthController {
   async createBooking(@Body() createBookingDto: CreateBookingDto) {
     return this.authService.createBooking(createBookingDto);
   }
+
+  @Post('logout')
+  async logoutUser(@Res() res: Response) {
+    // Clear the token cookie
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: false,
+      path: '/',
+      sameSite: 'strict'
+    });
+    return res.json({ message: 'Logged out successfully' });
+  }
 }
