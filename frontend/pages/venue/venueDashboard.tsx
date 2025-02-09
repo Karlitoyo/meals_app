@@ -1,5 +1,5 @@
-import Layout from "../components/Layout";
-import LoginForm from "../components/loginPage/LoginForm";
+import Layout from "../../components/Layout";
+import VenueDashboardPage from "../../components/venueDashboard/VenueDashboardPage";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 interface DecodedToken extends JwtPayload {
@@ -15,14 +15,13 @@ interface VenueDashboardPageProps {
   isUser: boolean;
 }
 
-const LoginPage = ({ venueId, token, isUser, isVenue }: VenueDashboardPageProps): JSX.Element => (
-  <Layout title="Login Page | Meals App" token={token} isUser={isUser} isVenue={isVenue} venueId={venueId}>
-    <LoginForm />
+const Dashboard = ({ venueId, token, isUser, isVenue }: VenueDashboardPageProps): JSX.Element => (
+  <Layout title="Venue Dashboard | Meals App" token={token} isUser={isUser} isVenue={isVenue}>
+  <VenueDashboardPage venueId={venueId} token={token} />
   </Layout>
 );
 
-export default LoginPage;
-
+export default Dashboard;
 
 export async function getServerSideProps(context) {
   const { req } = context;
@@ -40,27 +39,27 @@ export async function getServerSideProps(context) {
 
   try {
     const decodedToken = jwt.verify(token, process.env.SECRET_KEY) as DecodedToken;
-    const userId = decodedToken.sub;
+    const venueId = decodedToken.sub;
     const isVenue = decodedToken.isVenue;
     const isUser = decodedToken.isUser;
 
-    if (!userId) {
+    if (!venueId) {
       console.error("No 'sub' claim found in token.");
       return {
         props: {
           token,
-          userId: null,
+          venueId: null,
         },
       };
     }
 
     console.log("Decoded token:", decodedToken);
-    console.log("User ID:", userId);
+    console.log("Venue ID:", venueId);
 
     return {
       props: {
         token,
-        userId: Number(userId),
+        venueId: Number(venueId),
         isVenue,
         isUser,
       },
@@ -70,7 +69,7 @@ export async function getServerSideProps(context) {
     return {
       props: {
         token: '',
-        userId: null,
+        venueId: null,
       },
     };
   }

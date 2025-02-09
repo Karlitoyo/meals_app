@@ -51,7 +51,7 @@ export default function RegisterVenue() {
         throw new Error("Network response was not ok");
       } else {
         if (response.ok) {
-          router.push("/venueLogin");
+          router.push("/venue/venueLogin");
         }
         const data = await response.json();
         console.log("Registration successful:", data);
@@ -106,7 +106,7 @@ export default function RegisterVenue() {
           <div className="bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-sm text-gray-900 dark:text-gray-400">
-                <Link href="/venueLogin" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-500 dark:hover:text-blue-400">Login</Link>
+                <Link href="/venue/venueLogin" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-500 dark:hover:text-blue-400">Login</Link>
               </p>
             </div>
           </div>

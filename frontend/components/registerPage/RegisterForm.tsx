@@ -36,7 +36,7 @@ const RegisterForm = () => {
         throw new Error('Network response was not ok');
       } else {
         if (response.ok) {
-          router.push('/login');
+          router.push('/user/login');
         }
       const data = await response.json();
       console.log('Registration successful:', data);
@@ -75,12 +75,12 @@ const RegisterForm = () => {
           <div className="bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-sm text-gray-900 dark:text-gray-400">
-                <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-500 dark:hover:text-blue-400">Login</Link>
+                <Link href="/user/login" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-500 dark:hover:text-blue-400">Login</Link>
               </p>
               </div>
               <div className="text-center">
               <p className="text-sm text-gray-900 dark:text-gray-400">
-              <Link href="/venueRegister" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-500 dark:hover:text-blue-400">Host Register</Link>
+              <Link href="/venue/venueRegister" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-500 dark:hover:text-blue-400">Host Register</Link>
               </p>
               </div>
           </div>

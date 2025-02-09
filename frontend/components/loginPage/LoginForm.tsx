@@ -100,7 +100,7 @@ const LoginForm = () => {
           <div className="text-center">
             <p className="mt-3 text-sm text-gray-900 dark:text-gray-400">
               <Link
-                href="/register"
+                href="/user/register"
                 className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-500 dark:hover:text-blue-400"
               >
                 Register

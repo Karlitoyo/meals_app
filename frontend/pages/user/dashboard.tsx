@@ -1,5 +1,5 @@
-import Layout from "../components/Layout";
-import DashboardPage from "../components/dashboard/DashboardPage";
+import Layout from "../../components/Layout";
+import DashboardPage from "../../components/dashboard/DashboardPage";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 interface DecodedToken extends JwtPayload {

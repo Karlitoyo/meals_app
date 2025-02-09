@@ -29,7 +29,7 @@ export default function LoginVenue() {
   
       if (response.ok) {
         // Login successful, redirect user
-        router.push('/venueDashboard'); // Redirect to the user dashboard or home page
+        router.push('/venue/venueDashboard'); // Redirect to the user dashboard or home page
       } else {
         setError(data.error || 'Login failed');
       }
@@ -99,7 +99,7 @@ export default function LoginVenue() {
           <div className="text-center">
             <p className="mt-3 text-sm text-gray-900 dark:text-gray-400">
               <Link
-                href="/venueRegister"
+                href="/venue/venueRegister"
                 className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-500 dark:hover:text-blue-400"
               >
                 Register
