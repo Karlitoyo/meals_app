@@ -1,4 +1,6 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
+import styled from 'styled-components';
+
 
 interface CreateAvailabilityFormProps {
     venueId: string | number;

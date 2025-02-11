@@ -71,4 +71,8 @@ export class VenuesService {
   async findAll(): Promise<Venues[]> {
     return await this.venueRepository.find();
   }
+
+  async update(id: number, updateVenueDto: Partial<Venues>) {
+    await this.venueRepository.update(id, updateVenueDto);
+  }
 }

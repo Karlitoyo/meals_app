@@ -6,6 +6,7 @@ import {
   HttpException,
   HttpStatus,
   UseGuards,
+  Patch,
   Param,
 } from '@nestjs/common';
 import { VenuesService } from './venues.service';
@@ -14,6 +15,7 @@ import { LoginVenueDto } from './dto/login-venue.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GetUser } from '../services/get-user.decorator'; // Custom decorator to extract the user from the request
 import { VenueResponseDto } from './dto/venue-response.dto';
+import { Venues } from './venue.entity';
 
 @Controller('venues')
 export class VenuesController {
@@ -80,5 +82,14 @@ export class VenuesController {
   @Get(':id')
   async getVenueData(@Param('id') id: number) {
     return this.venueService.findById(id);
+  }
+
+  @Patch(':id')
+  async updateVenue(
+    @Param('id') id: number,
+    @Body() updateVenueDto: Partial<Venues>,
+  ) {
+    await this.venueService.update(id, updateVenueDto);
+    return { message: 'Venue updated successfully' };
   }
 }

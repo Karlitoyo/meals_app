@@ -22,4 +22,7 @@ export class User {
 
   @Column({ default: true })
   isUser?: boolean;
+
+  @Column({ nullable: true })
+  imageUrl?: string;
 }

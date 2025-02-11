@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import CreateAvailabilityForm from "./availabilityConfirm";
-import { VenueList } from "./VenuesApiComponent";
 
 interface VenueData {
   firstName: string;
@@ -151,7 +150,6 @@ export default function VenueDashboardPage({
       </div>
       {/* Users by Country */}
       <CreateAvailabilityForm venueId={venueId} />
-      <VenueList venueId={venueId} token={token} />
     </div>
   );
 }
