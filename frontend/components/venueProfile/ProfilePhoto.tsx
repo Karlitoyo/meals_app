@@ -1,9 +1,9 @@
 "use client";
+import nookies from "nookies";
+import { GetServerSideProps } from "next";
 import { useState } from "react";
 import { Upload, X } from "lucide-react";
 import Image from "next/image";
-import { GetServerSideProps } from "next";
-import nookies from "nookies";
 
 interface ProfilePhotoUploadProps {
   initialImageUrl?: string;
@@ -15,20 +15,19 @@ interface ProfilePhotoUploadProps {
   onUpload: (file: File) => void;
 }
 
-const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps > = ({
+const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
   initialImageUrl,
   venueId,
   userId,
   token,
   isUser,
   isVenue,
+  onUpload,
 }) => {
   const [image, setImage] = useState<string | null>(initialImageUrl || null);
 
   const profileType = isUser ? "User" : isVenue ? "Venue" : "Unknown";
-  console.log("ProfilePhotoUpload: profileType:", profileType);
-  console.log("ProfilePhotoUpload: isUser:", isUser);
-  console.log("ProfilePhotoUpload: isVenue:", isVenue);
+  console.log("Profile Type:", profileType);
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -36,14 +35,19 @@ const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps > = ({
     if (!selectedFile) return;
 
     const formData = new FormData();
-    formData.append("file", selectedFile);
+    formData.append("file", selectedFile); // Make sure "file" matches the backend FileInterceptor field
+
 
     const uploadUrl = isVenue
       ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploadPhoto/venue-image`
       : `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploadPhoto/user-image`;
-    const updateUrl = isVenue
-      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/venues/${venueId}`
-      : `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}`;
+
+    const updateUrl =
+      isVenue && venueId
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/venues/${venueId}`
+        : isUser && userId
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}`
+        : null;
 
     try {
       const uploadResponse = await fetch(uploadUrl, {
@@ -51,25 +55,29 @@ const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps > = ({
         body: formData,
       });
 
+      if (!uploadResponse.ok) throw new Error("Upload failed");
+
       const data = await uploadResponse.json();
+      
       if (data.imageUrl) {
         setImage(data.imageUrl);
+        onUpload(selectedFile); // Notify parent component
 
-        await fetch(updateUrl, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ imageUrl: data.imageUrl }),
-        });
+        if (updateUrl) {
+          await fetch(updateUrl, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ imageUrl: data.imageUrl }),
+          });
+        }
       }
     } catch (error) {
       console.error("Upload failed:", error);
     }
   };
-
-  const removeImage = () => setImage(null);
 
   return (
     <div className="flex flex-col items-center gap-4 p-6 bg-gray-100 border border-gray-300 rounded-lg shadow-md">
@@ -88,7 +96,7 @@ const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps > = ({
               className="object-cover rounded-full"
             />
             <button
-              onClick={removeImage}
+              onClick={() => setImage(null)}
               className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
             >
               <X size={16} />

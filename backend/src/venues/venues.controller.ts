@@ -85,11 +85,7 @@ export class VenuesController {
   }
 
   @Patch(':id')
-  async updateVenue(
-    @Param('id') id: number,
-    @Body() updateVenueDto: Partial<Venues>,
-  ) {
-    await this.venueService.update(id, updateVenueDto);
-    return { message: 'Venue updated successfully' };
+  async updateVenue(@Param('id') id: number, @Body() updateData: { imageUrl?: string }) {
+    return this.venueService.update(id, updateData);
   }
 }

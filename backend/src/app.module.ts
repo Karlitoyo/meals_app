@@ -16,6 +16,7 @@ import { BookingsModule } from './bookings/bookings.module';
 import { AvailabilityModule } from './availability/availabilitys.module';
 import { Availability } from './availability/availability.entity';
 import { Booking } from './bookings/booking.entity';
+import { UploadController } from "./uploadPhoto/upload.controller"; // Adjust path as needed
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -35,7 +36,7 @@ import { Booking } from './bookings/booking.entity';
   AvailabilityModule,
   ConfigModule.forRoot(),
 ],
-  controllers: [AppController, UsersController, VenuesController, BookingsController, AvailabilityController],
+  controllers: [AppController, UsersController, VenuesController, BookingsController, AvailabilityController, UploadController],
   providers: [AppService],
 })
 export class AppModule {}
