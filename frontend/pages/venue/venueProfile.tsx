@@ -16,7 +16,7 @@ interface VenueDashboardPageProps {
 }
 
 const ProfileVenuePage = ({ venueId, token, isUser, isVenue }: VenueDashboardPageProps): JSX.Element => (
-  <Layout title="Login Venue Page | Meals App" token={token} isUser={isUser} isVenue={isVenue}>
+  <Layout title="Profile Venue Page | Meals App" token={token} isUser={isUser} isVenue={isVenue}>
     <ProfileVenue venueId={venueId} token={token} isUser={isUser} isVenue={isVenue} />
   </Layout>
 );

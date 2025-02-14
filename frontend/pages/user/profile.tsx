@@ -16,7 +16,7 @@ interface UserDashboardPageProps {
 }
 
 const ProfileUserPage = ({ userId, token, isUser, isVenue }: UserDashboardPageProps): JSX.Element => (
-  <Layout title="Login Venue Page | Meals App" token={token} isUser={isUser} isVenue={isVenue}>
+  <Layout title="Profile User Page | Meals App" token={token} isUser={isUser} isVenue={isVenue}>
     <ProfileVenue userId={userId} token={token} isUser={isUser} isVenue={isVenue}/>
   </Layout>
 );
@@ -55,7 +55,7 @@ export async function getServerSideProps(context) {
     }
 
     console.log("Decoded token:", decodedToken);
-    console.log("Venue ID:", userId);
+    console.log("User ID:", userId);
 
     return {
       props: {
