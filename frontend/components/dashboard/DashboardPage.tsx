@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Card from "./CardComponent";
-import { services } from "../../public/shared/constants/constants";
 import { useRouter } from "next/router";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { GetServerSidePropsContext } from "next";

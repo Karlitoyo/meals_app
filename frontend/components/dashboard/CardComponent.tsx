@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useRouter } from "next/router";
 import { CardProps } from "../../interfaces/dashboard-card-comp";
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -17,13 +17,15 @@ interface DecodedToken extends JwtPayload {
 
 export const Card: React.FC<CardProps & BookingComponentProps> = ({
   service,
-  token,
-  userId,
-  venueId,
 }) => {
   const router = useRouter();
-  const [venueData, setVenueData] = useState(null);
-  const [error, setError] = useState<string | null>(null);
+  const imageUrl = service.imageUrl
+    ? service.imageUrl.startsWith("http")
+      ? service.imageUrl
+      : `${process.env.NEXT_PUBLIC_BACKEND_URL}${service.imageUrl}`
+    : "/default-placeholder.jpg"; // Fallback image
+
+  console.log("Image URL:", imageUrl);
 
   const handleSelect = () => {
     router.push({
@@ -37,7 +39,6 @@ export const Card: React.FC<CardProps & BookingComponentProps> = ({
       },
     });
   };
-  
 
   return (
     <div
@@ -47,7 +48,7 @@ export const Card: React.FC<CardProps & BookingComponentProps> = ({
       {/* Image Section */}
       <div className="w-full h-48 bg-gray-200">
         <img
-          src={service.imageUrl}
+          src={imageUrl}
           alt={service.title}
           className="w-full h-full object-cover"
         />

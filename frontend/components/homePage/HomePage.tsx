@@ -1,5 +1,4 @@
 import Image from "next/image";
-import ToggleTheme from "../toggleTheme/ToggleTheme";
 import { useRouter } from 'next/router';
 
 export default function Home() {
@@ -12,10 +11,10 @@ export default function Home() {
         <Image
           src="/images/hero/hero-image.jpg" // Path to your image
           alt="Hero Background"
-          layout="fill" // Ensures the image covers the entire section
-          objectFit="cover" // Ensures the image scales properly
-          quality={90} // Adjusts image quality for optimization
-          priority // Ensures this image loads quickly
+          fill // Ensures the image covers the entire section
+          className="object-cover"
+          quality={100}
+          priority
         />
 
         {/* Overlay */}
@@ -42,13 +41,13 @@ export default function Home() {
           <div className="card bg-base-100 shadow-sm">
             <figure>
               <Image
-                src="/images/middle-section/salmon.jpg" // Path to your image
+                src="/images/middle-section/salmon.jpg"
                 alt="Salmon Dish"
-                width={400}
+                width={500}
                 height={300}
-                objectFit="cover" // Ensures the image scales properly
-                quality={90} // Adjusts image quality for optimization
-                priority // Ensures this image loads quickly
+                className="object-cover"
+                quality={90}
+                priority
               />
             </figure>
             <div className="card-body">
@@ -77,13 +76,13 @@ export default function Home() {
             </div>
             <figure>
               <Image
-                src="/images/middle-section/spring-roll.jpg" // Path to your image
+                src="/images/middle-section/spring-roll.jpg"
                 alt="Salmon Dish"
-                width={400}
+                width={500}
                 height={300}
-                objectFit="cover" // Ensures the image scales properly
-                quality={90} // Adjusts image quality for optimization
-                priority // Ensures this image loads quickly
+                className="object-cover"
+                quality={90}
+                priority
               />
             </figure>
           </div>
@@ -92,13 +91,13 @@ export default function Home() {
           <div className="card bg-base-100 shadow-sm">
             <figure>
               <Image
-                src="/images/middle-section/steak.jpg" // Path to your image
+                src="/images/middle-section/steak.jpg"
                 alt="Salmon Dish"
-                width={400}
+                width={500}
                 height={300}
-                objectFit="cover" // Ensures the image scales properly
-                quality={90} // Adjusts image quality for optimization
-                priority // Ensures this image loads quickly
+                className="object-cover"
+                quality={90}
+                priority
               />
             </figure>
             <div className="card-body">
