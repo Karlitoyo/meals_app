@@ -16,8 +16,8 @@ export class BookingsController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll(@Query('userId') userId: number, @Query('venueId') venueId: number) {
-    return this.bookingsService.findAll(userId, venueId);
+  findAll(@Query('userId') userId: number) {
+    return this.bookingsService.findAll(userId);
   }
 
   @Put(':id')

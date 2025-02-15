@@ -1,32 +1,27 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Venues } from '../venues/venue.entity';
 
 @Entity()
-
 export class Booking {
-
   @PrimaryGeneratedColumn()
   id: number;
-  
-  @ManyToOne(() => User, user => user.id)
-  @JoinColumn({ name: 'userId' })
+
+  @ManyToOne(() => User, (user) => user.bookingId, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => Venues, venue => venue.id)
-  @JoinColumn({ name: 'venueId' })
+  @ManyToOne(() => Venues, (venue) => venue.bookings, { onDelete: 'CASCADE' })
   venue: Venues;
 
-  @Column({ type: 'timestamp' })
+  @Column({ nullable: true })
+  userId: number;
+
+  @Column({ nullable: true })
+  venueId: number;
+
+  @Column()
   startTime: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column()
   endTime: Date;
-
-  @Column({ default: 'pending' })
-  status: string; // e.g., 'pending', 'confirmed', 'cancelled'
-
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
-
 }

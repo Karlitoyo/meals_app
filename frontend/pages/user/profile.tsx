@@ -1,5 +1,5 @@
 import Layout from "../../components/Layout";
-import ProfileVenue from "../../components/profilePage/UserProfilePage";
+import ProfileUser from "../../components/profilePage/UserProfilePage";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 interface DecodedToken extends JwtPayload {
@@ -17,7 +17,7 @@ interface UserDashboardPageProps {
 
 const ProfileUserPage = ({ userId, token, isUser, isVenue }: UserDashboardPageProps): JSX.Element => (
   <Layout title="Profile User Page | Meals App" token={token} isUser={isUser} isVenue={isVenue}>
-    <ProfileVenue userId={userId} token={token} isUser={isUser} isVenue={isVenue}/>
+    <ProfileUser userId={userId} token={token} isUser={isUser} isVenue={isVenue}/>
   </Layout>
 );
 

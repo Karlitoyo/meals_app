@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Availability } from '../availability/availability.entity'; // Adjust the path if needed
+import { Booking } from '../bookings/booking.entity';
 
 @Entity()
 export class Venues {
@@ -61,6 +62,11 @@ export class Venues {
   isVenue?: boolean;
 
   // Add the relationship to Availability
-  @OneToMany(() => Availability, (availability) => availability.venue, { nullable: true })
+  @OneToMany(() => Availability, (availability) => availability.venue, {
+    nullable: true,
+  })
   availabilities: Availability[]; // One venue can have multiple availabilities
+
+  @OneToMany(() => Booking, (booking) => booking.venue)
+  bookings: Booking[];
 }

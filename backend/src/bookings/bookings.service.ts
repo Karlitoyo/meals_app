@@ -6,6 +6,8 @@ import { Repository, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { Booking } from './booking.entity';
 import { AvailabilityService } from '../availability/availabilitys.service';
 import { Availability } from '../availability/availability.entity';
+import { Venues } from '../venues/venue.entity';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class BookingsService {
@@ -15,12 +17,23 @@ export class BookingsService {
     private readonly availabilityService: AvailabilityService,
     @InjectRepository(Availability)
     private availabilityRepository: Repository<Availability>,
+    @InjectRepository(Venues)
+    private venuesRepository: Repository<Venues>,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
   ) {}
 
   async createBooking(createBookingDto: CreateBookingDto) {
-    const { venueId, startTime, endTime } = createBookingDto;
+    const { userId, venueId, startTime, endTime } = createBookingDto;
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
+
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    const venue = await this.venuesRepository.findOne({ where: { id: venueId } });
+
+    if (!user || !venue) {
+      throw new BadRequestException('User or Venue not found');
+    }
 
     // Check if the venue is available for the given time
     const availability = await this.availabilityRepository.findOne({
@@ -37,7 +50,7 @@ export class BookingsService {
         'Venue is not available at the selected time.',
       );
     }
-    
+
     // Ensure the booking time is within the availability slot
     if (startDate < availability.startTime || endDate > availability.endTime) {
       throw new BadRequestException(
@@ -53,19 +66,26 @@ export class BookingsService {
     return this.bookingsRepository.save(booking);
   }
 
-  async findAll(userId?: number, venueId?: number): Promise<Booking[]> {
-    const query = this.bookingsRepository.createQueryBuilder('booking');
-
-    if (userId) {
-      query.andWhere('booking.userId = :userId', { userId });
+  async findAll(userId: number): Promise<Venues[]> {
+    if (!userId) {
+      throw new BadRequestException('User ID is required');
     }
-
-    if (venueId) {
-      query.andWhere('booking.venueId = :venueId', { venueId });
+  
+    const bookings = await this.bookingsRepository
+      .createQueryBuilder('booking')
+      .leftJoinAndSelect('booking.venue', 'venue') 
+      .leftJoinAndSelect('booking.user', 'user') // Ensure user is joined
+      .where('user.id = :userId', { userId }) // Use user.id instead of booking.userId
+      .select(['venue.id', 'venue.title', 'venue.address', 'venue.imageUrl'])
+      .getMany();
+  
+    if (!bookings.length) {
+      console.log('No bookings found for user:', userId);
     }
-
-    return query.getMany();
+  
+    return bookings.map((booking) => booking.venue);
   }
+  
 
   async update(
     id: number,

@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Booking } from '../bookings/booking.entity';
 
 @Entity()
 export class User {
@@ -25,4 +26,17 @@ export class User {
 
   @Column({ nullable: true })
   imageUrl?: string;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+
+  createdAt: Date;
+  
+  @Column({ nullable: true })
+  phone?: string;
+
+  @Column({ nullable: true })
+  bookingId?: number;
+
+  @OneToMany(() => Booking, (booking) => booking.user)
+  bookings: Booking[];
 }

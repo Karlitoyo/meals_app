@@ -13,32 +13,27 @@ interface UserData {
     // add other venue properties as needed
 }
 
-export default function ProfileVenue({ token, isUser, isVenue, userId }: ProfileUserProps) {
+export default function ProfileUser({ token, isUser, isVenue, userId }: ProfileUserProps) {
     const [venue, setVenue] = useState<UserData | null>(null);
 
-    useEffect(() => {
-        const fetchVenue = async () => {
-            try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (!response.ok) throw new Error("Failed to fetch venue");
-                const data = await response.json();
-                setVenue(data);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-    
-        if (userId) fetchVenue();
-    }, [userId, token]);
-    
+    async function fetchUserVenues(userId, token) {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/bookings?userId=${userId}`, {
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: 'include', // Include cookies in the request
+        });
+      
+        const data = await response.json();
+        console.log(data); // Should return an array of venue objects
+      }
 
     return (
         <div>
-            <h1 className="mt-16">Profile Venue Page</h1>
+            <h1 className="mt-16">Profile User Page</h1>
+            <button onClick={() => fetchUserVenues(userId, token)}>Fetch User Venues</button>
             <div className="mt-40">
                 <div>{userId}</div>
             </div>
