@@ -1,41 +1,38 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+
 import { Booking } from '../bookings/booking.entity';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id?: number;
+  id: number;
 
   @Column()
-  firstName?: string;
+  firstName: string;
 
   @Column()
-  lastName?: string;
+  lastName: string;
 
   @Column({ unique: true })
-  email?: string;
+  email: string;
 
   @Column()
-  password?: string;
+  password: string;
 
   @Column({ default: false })
-  isActive?: boolean;
+  isActive: boolean;
 
   @Column({ default: true })
-  isUser?: boolean;
+  isUser: boolean;
 
   @Column({ nullable: true })
-  imageUrl?: string;
+  imageUrl: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-
   createdAt: Date;
-  
-  @Column({ nullable: true })
-  phone?: string;
 
   @Column({ nullable: true })
-  bookingId?: number;
+  phone: string;
 
   @OneToMany(() => Booking, (booking) => booking.user)
   bookings: Booking[];

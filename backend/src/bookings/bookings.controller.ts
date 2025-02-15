@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  Query,
+  UseGuards,
+  ParseIntPipe,
+} from '@nestjs/common';
+
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
@@ -11,25 +23,51 @@ export class BookingsController {
   @UseGuards(JwtAuthGuard)
   @Post('createBooking')
   async create(@Body() createBookingDto: CreateBookingDto) {
-    return this.bookingsService.createBooking(createBookingDto);
+    try {
+      return await this.bookingsService.createBooking(createBookingDto);
+    } catch (error) {
+      // Handle error appropriately
+
+      throw error;
+    }
   }
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll(@Query('userId') userId: number) {
-    return this.bookingsService.findAll(userId);
+  async findAll(@Query('userId', ParseIntPipe) userId: number) {
+    try {
+      return await this.bookingsService.findAll(userId);
+    } catch (error) {
+      // Handle error appropriately
+
+      throw error;
+    }
   }
 
+  @UseGuards(JwtAuthGuard) // Consider adding guards here as well
   @Put(':id')
-  update(@Param('id') id: number, @Body() updateBookingDto: UpdateBookingDto) {
-    return this.bookingsService.update(id, updateBookingDto);
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateBookingDto: UpdateBookingDto,
+  ) {
+    try {
+      return await this.bookingsService.update(id, updateBookingDto);
+    } catch (error) {
+      // Handle error appropriately
+
+      throw error;
+    }
   }
 
+  @UseGuards(JwtAuthGuard) // Consider adding guards here as well
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.bookingsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    try {
+      return await this.bookingsService.remove(id);
+    } catch (error) {
+      // Handle error appropriately
+
+      throw error;
+    }
   }
-
 }
-
-

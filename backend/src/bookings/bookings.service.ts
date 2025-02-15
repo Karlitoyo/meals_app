@@ -29,7 +29,9 @@ export class BookingsService {
     const endDate = new Date(endTime);
 
     const user = await this.usersRepository.findOne({ where: { id: userId } });
-    const venue = await this.venuesRepository.findOne({ where: { id: venueId } });
+    const venue = await this.venuesRepository.findOne({
+      where: { id: venueId },
+    });
 
     if (!user || !venue) {
       throw new BadRequestException('User or Venue not found');
@@ -66,25 +68,27 @@ export class BookingsService {
     return this.bookingsRepository.save(booking);
   }
 
-  async findAll(userId: number): Promise<Venues[]> {
+  async findAll(userId: number): Promise<any[]> {
     if (!userId) {
       throw new BadRequestException('User ID is required');
     }
   
-    const bookings = await this.bookingsRepository
-      .createQueryBuilder('booking')
-      .leftJoinAndSelect('booking.venue', 'venue') 
-      .leftJoinAndSelect('booking.user', 'user') // Ensure user is joined
-      .where('user.id = :userId', { userId }) // Use user.id instead of booking.userId
-      .select(['venue.id', 'venue.title', 'venue.address', 'venue.imageUrl'])
-      .getMany();
-  
+    const bookings = await this.bookingsRepository.query(
+      'SELECT venues.id, venues.title, venues.address, venues."imageUrl" FROM booking INNER JOIN venues ON booking."venueId" = venues.id WHERE booking."userId" = $1',
+      [userId]
+    );
+    console.log('Bookings:', bookings);
     if (!bookings.length) {
       console.log('No bookings found for user:', userId);
     }
+    // Since each booking is actually a venue object, return the bookings array directly
+    console.log('Venues:', bookings);
   
-    return bookings.map((booking) => booking.venue);
+    return bookings;
+  
   }
+  
+  
   
 
   async update(
